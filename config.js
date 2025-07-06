@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url'
 
 
 global.owner = [
-  ['50493732693', 'Wirk', true],
+  ['573133374132', 'Wirk', true],
 ]
 
 
@@ -21,11 +21,11 @@ global.jadi = 'JadiBots'
 global.yukiJadibts = true
 
 global.packname = '✦ 𝖸𝗎𝗋𝗎 𝖸𝗎𝗋𝗂 ✦'
-global.namebot = '✧ ʏᴜʀᴜ ʏᴜʀɪ ✧'
-global.author = '「☄︎」 ᴍᴀᴅᴇ ᴡɪᴛʜ 𝘄𝗶𝗿𝗸'
+global.namebot = '𝙎𝙃𝙊𝙔𝙊 𝙃𝙄𝙉𝘼𝙏𝘼 ოძ  𝘽 ꂦ Ꮏ'
+global.author = 'HAROLD Y 💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖 '
 
 
-global.namecanal = '➩ ᴄʜᴀɴɴᴇʟ ʏᴜʀᴜ ʏᴜʀɪ ✧'
+global.namecanal = '𝙎𝙃𝙊𝙔𝙊 𝙃𝙄𝙉𝘼𝙏𝘼 ოძ  𝘽 ꂦ Ꮏ'
 global.canal = 'https://whatsapp.com/channel/0029Vb5pM031CYoMvQi2I02D'
 global.idcanal = '120363420047428304@newsletter'
 
