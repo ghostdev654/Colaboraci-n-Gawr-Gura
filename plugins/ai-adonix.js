@@ -12,7 +12,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     const res = await fetch(apiURL);
     const data = await res.json();
 
-    // Si devuelve imagen
+    // 📷 Imagen generada
     if (data.imagen_generada) {
       await conn.sendMessage(m.chat, {
         image: { url: data.imagen_generada },
@@ -22,7 +22,19 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
       return;
     }
 
-    // Si devuelve respuesta tipo texto
+    // 🎤 Audio tipo PTT sin externalAdReply
+    if (data.audio && typeof data.audio === 'string') {
+      await conn.sendMessage(m.chat, {
+        audio: { url: data.audio },
+        ptt: true,
+        mimetype: 'audio/mpeg',
+        fileName: `adonix-voz.mp3`
+      }, { quoted: m });
+      await m.react('✅');
+      return;
+    }
+
+    // 🧠 Texto con o sin código
     if (data.respuesta && typeof data.respuesta === 'string') {
       const [mensaje, ...codigo] = data.respuesta.split(/```(?:javascript|js|html|)/i);
       let respuestaFinal = `🌵 *Adonix IA :*\n\n${mensaje.trim()}`;
@@ -36,7 +48,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
       return;
     }
 
-    // Si no trae ni imagen ni texto válido
+    // ❌ Ninguna respuesta válida
     await m.react('❌');
     return m.reply('❌ No se pudo procesar la respuesta de Adonix IA.');
 
