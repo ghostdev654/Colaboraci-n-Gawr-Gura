@@ -30,15 +30,12 @@ const defaultMenu = {
 
 > ⌦ ✧ Mᴇɴᴜ ᴅᴇ ᴄᴏᴍᴀɴᴅᴏꜱ ➤
 
-> ❀ ᴀᴅᴏɴɪx ᴀᴘɪ ❀
- ⤿ https://theadonix-api.vercel.app
-
 %readmore`.trimStart(),
 
   header: '\n> *✿ ❝ %category ❞*',
   body: '\n> ☄︎ %cmd %islimit %isPremium',
   footer: '',
-  after: '\n> ⋆｡ﾟ☁︎｡⋆｡ ᴍᴀᴅᴇ ᴡɪᴛʜ ʙʏ 𝗪𝗶𝗿𝗸',
+  after: '\n> ⋆power by Harold',
 }
 
 const handler = async (m, { conn, usedPrefix: _p }) => {
@@ -77,7 +74,7 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
       }
     }
 
-    const tipo = botActual === '+50493059810'.replace(/\D/g, '')
+    const tipo = botActual === '+50764735869'.replace(/\D/g, '')
       ? 'Principal 🅥'
       : 'Sub Bot 🅑'
 
