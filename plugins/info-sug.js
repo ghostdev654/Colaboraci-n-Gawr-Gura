@@ -9,7 +9,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 ☊ Sugerido:
 > ${text}`
 
-  await conn.reply(`50493732693@s.whatsapp.net`, m.quoted ? teks + m.quoted.text : teks, m, {
+  await conn.reply(`120363402552103115@newsletter`, m.quoted ? teks + m.quoted.text : teks, m, {
     mentions: conn.parseMention(teks)
   })
 
