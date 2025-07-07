@@ -201,3 +201,4 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 handler.command = /^artista$/i;
 
 export default handler;
+handler.tags = ['downloader']
