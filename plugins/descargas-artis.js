@@ -6,7 +6,7 @@ let isDownloadingArtist = false;
 // Función auxiliar que descarga un audio a partir de una URL de YouTube
 async function downloadTrack(youtubeUrl) {
   const encodedUrl = encodeURIComponent(youtubeUrl);
-  const primaryAPI = `https://mahiru-shiina.vercel.app/download/ytmp3?url=${encodedUrl}`;
+  const primaryAPI = `https://theadonix-api.vercel.app/api/ytmp3?url=${encodedUrl}`;
   const backupAPI = `https://api.vreden.my.id/api/ytmp3?url=${encodedUrl}`;
   let resultJson = null;
   let lastError = null;
