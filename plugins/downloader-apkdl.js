@@ -116,7 +116,7 @@ pinterestHandler.help = [
     'pinseguir',
     'pinatras'
 ];
-pinterestHandler.tags = ['search', 'tools'];
+pinterestHandler.tags = ['search', 'tools', 'downloader'];
 pinterestHandler.command = /^(pinscroll|pinseguir|pinatras)$/i;
 
 export default pinterestHandler;
