@@ -4,7 +4,7 @@ let handler = async (m, { conn, text}) => {
 
   try {
     const mensaje = `
-🌸 *Miku Bot se despide del grupo* 🌸
+ *𝙎𝙃𝙊𝙔𝙊 𝙃𝙄𝙉𝘼𝙏𝘼 ოძ  𝘽 ꂦ Ꮏ se despide del grupo* 
 
 👋 Ha sido un gusto estar con ustedes.
 `;
