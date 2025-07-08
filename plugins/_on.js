@@ -3,6 +3,7 @@ import fetch from 'node-fetch'
 let linkRegex = /chat\.whatsapp\.com\/[0-9A-Za-z]{20,24}/i
 let linkRegex1 = /whatsapp\.com\/channel\/[0-9A-Za-z]{20,24}/i
 const defaultImage = 'https://files.catbox.moe/felkw2.jpg'
+const byeImage = 'https://files.catbox.moe/fkm1jz.jpg' // Imagen personalizada para despedidas
 
 // helper para checar si es admin o owner
 async function isAdminOrOwner(m, conn) {
@@ -57,14 +58,13 @@ handler.before = async (m, { conn }) => {
   if (!global.db.data.chats[m.chat]) global.db.data.chats[m.chat] = {}
   const chat = global.db.data.chats[m.chat]
 
-  // Antiárabe solo para entradas (stubType 27)
+  // Antiárabe
   if (chat.antiarabe && m.messageStubType === 27) {
     const newJid = m.messageStubParameters?.[0]
     if (!newJid) return
 
     const number = newJid.split('@')[0].replace(/\D/g, '')
     const arabicPrefixes = ['212', '20', '971', '965', '966', '974', '973', '962']
-
     const isArab = arabicPrefixes.some(prefix => number.startsWith(prefix))
 
     if (isArab) {
@@ -78,8 +78,8 @@ handler.before = async (m, { conn }) => {
   if (chat.antilink) {
     const groupMetadata = await conn.groupMetadata(m.chat)
     const isUserAdmin = groupMetadata.participants.find(p => p.id === m.sender)?.admin
-
     const text = m?.text || ''
+
     if (!isUserAdmin && (linkRegex.test(text) || linkRegex1.test(text))) {
       const userTag = `@${m.sender.split('@')[0]}`
       const delet = m.key.participant
@@ -133,11 +133,9 @@ handler.before = async (m, { conn }) => {
     if (m.messageStubType === 27) {
       const txtWelcome = '🌸 𝙱𝙸𝙴𝙽𝚅𝙴𝙽𝙸𝙳@ 🌸'
       const bienvenida = `
-✿ *Bienvenid@* a *${groupMetadata.subject}* 🌺  
-✰ ${userMention}, ¡qué gusto!  
-✦ Ahora somos *${groupSize}* 🧑‍🤝‍🧑  
-🐾 Pásala bien y comparte.  
-> *#help* para comandos.
+𝙷𝙾𝙻𝙰 ֮ϐׁꪱׁׁׁׅׅׅꫀׁׅܻ݊݊ꪀׁׅ᥎ׁׅꫀׁׅܻ݊݊ꪀꪱׁׁׁׅׅׅժׁׅ݊${userMention}🆒
+Ꭺ ꍟꑄ꓄ꍟ 𝙝𝙚𝙧𝙢𝙤𝙨𝙤 ✨😍 grupo 👥
+𝔢𝔰𝔭𝔢𝔯𝔬 ɖɨֆʄʀʊȶɛֆ tׁׅυׁׅ 𝑒𝑠𝑡𝑎𝑑𝑖́𝑎✌🏽😍
 `.trim()
 
       await conn.sendMessage(m.chat, {
@@ -150,15 +148,15 @@ handler.before = async (m, { conn }) => {
     if (m.messageStubType === 28 || m.messageStubType === 32) {
       const txtBye = '🌸 𝙰𝙳𝙸Ó𝚂 🌸'
       const despedida = `
-✿ *Adiós* de *${groupMetadata.subject}* 🥀  
-✰ ${userMention}, vuelve pronto ✨  
-✦ Somos *${groupSize}* aún.  
-💌 Cuídate, nos vemos.  
-> *#help* si necesitas.
+ႮႶ 𝐚𝐩𝐚𝐜𝐢𝐨𝐧𝐚𝐝𝐨😻 ρσя ૯Ն ｖｏｌｅｉｂｏｌ🏐
+𝐚𝐜𝐚𝐛𝐚 ძҽ ａｂａｎｄｏｎａｒ👎🏽 este 𝗁𝖾𝗋𝗆𝗈𝗌𝗈 ✨ ᵍʳᵘᵖᵒ😕😍  
+✰ ${userMention}  
+✦ Ahora somos *${groupSize}*  
+> *#help* si necesitas algo.
 `.trim()
 
       await conn.sendMessage(m.chat, {
-        image: { url: profilePic },
+        image: { url: byeImage },
         caption: `${txtBye}\n\n${despedida}`,
         contextInfo: { mentionedJid: [userId] }
       })
