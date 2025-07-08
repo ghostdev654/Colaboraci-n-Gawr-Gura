@@ -25,7 +25,7 @@ const handler = async (m, { conn, args, command, usedPrefix }) => {
 
   const header = `
 ╭──────────────────────╮
-│       ${decoEmoji2} *🗣️ MENCIÓN GENERAL* ${decoEmoji2}       │
+│       ${decoEmoji2} *𝗠𝗲𝗻𝗰𝗶𝗼́𝗻📩 𝗴𝗲𝗻𝗲𝗿𝗮𝗹 𝗽𝗮𝗿𝗮 𝘁𝗼𝗱𝗼𝘀 𝗹𝗼𝘀 𝗺𝗶𝗲𝗺𝗯𝗿𝗼𝘀 𝗱𝗲 𝗽𝗮𝗿𝘁𝗲 𝗱𝗲 𝘂𝗻 𝗮𝗱𝗺𝗶𝗻𝗶𝘀𝘁𝗿𝗮𝗱𝗼𝗿😳😍* ${decoEmoji2}       │
 ╰──────────────────────╯
 `;
 
