@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url'
 
 
 global.owner = [
-  ['573133374132', 'Harold', true],
+  ['573133374132', '💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖 ', true],
 ]
 
 
@@ -15,7 +15,7 @@ global.libreria = 'Baileys'
 global.baileys = 'V 6.7.16' 
 global.vs = '2.2.0'
 global.nameqr = 'YuriBotMD'
-global.namebot = '✿◟ʏᴜʀᴜ ʏᴜʀɪ ᴍᴅ◞✿'
+global.namebot ='jim wo sung'
 global.sessions = 'Sessions'
 global.jadi = 'JadiBots' 
 global.yukiJadibts = true
