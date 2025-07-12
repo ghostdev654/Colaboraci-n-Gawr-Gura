@@ -20,8 +20,8 @@ let old = performance.now()
 let neww = performance.now()
 let speed = neww - old
 const used = process.memoryUsage()
-let megumin = `⭐️ \`\`\`Información - MeguminBot\`\`\` ⭐️\n\n`
-megumin += `🍄 *◜Creador◞* ⇢ David-Chian\n`
+let megumin = `⭐️ \`\`\`Información - Gawr GURA BOT \`\`\` ⭐️\n\n`
+megumin += `🍄 *◜Creador◞* ⇢ 💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖 \n`
 megumin += `❗️ *◜Prefijo◞* ⇢ [ ${usedPrefix} ]\n`
 megumin += `🌺꙰ *◜Versión◞* ⇢ ${vs}\n`
 megumin += `🌻꙰ *◜Chats Privados◞* ⇢ ${chats.length - groupsIn.length}\n`
@@ -37,7 +37,7 @@ await conn.sendFile(m.chat, pp, 'megumin.jpg', megumin, m, null, rcanal)
 handler.help = ['status']
 handler.tags = ['info']
 handler.command = ['estado', 'status', 'estate', 'state', 'stado', 'stats']
-handler.register = true
+handler.register = false
 export default handler
 
 function clockString(ms) {
