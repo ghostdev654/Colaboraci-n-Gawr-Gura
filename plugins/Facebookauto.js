@@ -59,7 +59,7 @@ const handler = async (m, { conn }) => {
 handler.customPrefix = /https?:\/\/(www\.)?(facebook\.com|fb\.watch)\//i;
 handler.command = new RegExp;
 handler.group = true;
-handler.register = true;
+handler.register = false;
 handler.limit = true;
 
 export default handler;
