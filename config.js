@@ -20,17 +20,17 @@ global.sessions = 'Sessions'
 global.jadi = 'JadiBots' 
 global.yukiJadibts = true
 
-global.packname = '𝙎𝙃𝙊𝙔𝙊 𝙃𝙄𝙉𝘼𝙏𝘼 ოძ  𝘽 ꂦ Ꮏ'
-global.namebot = '𝙎𝙃𝙊𝙔𝙊 𝙃𝙄𝙉𝘼𝙏𝘼 ოძ  𝘽 ꂦ Ꮏ'
+global.packname = 'Gawr Gura'
+global.namebot = 'Gawr Gura'
 global.author = 'HAROLD Y 💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖 '
 
 
-global.namecanal = '𝙎𝙃𝙊𝙔𝙊 𝙃𝙄𝙉𝘼𝙏𝘼 ოძ  𝘽 ꂦ Ꮏ'
-global.canal = 'https://whatsapp.com/channel/0029Vb6MFShKGGGBWePRFc0U'
-global.idcanal = '120363402552103115@newsletter'
+global.namecanal = 'Gawr Gura'
+global.canal = 'https://whatsapp.com/channel/0029Vb5atcVL7UVQwAB9tU2k'
+global.idcanal = '120363419172960653@newsletter'
 
 global.ch = {
-ch1: '120363402552103115@newsletter',
+ch1: '120363419172960653@newsletter',
 }
 
 global.multiplier = 69 
