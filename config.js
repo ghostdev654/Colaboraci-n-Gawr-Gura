@@ -15,14 +15,14 @@ global.libreria = 'Baileys'
 global.baileys = 'V 6.7.16' 
 global.vs = '2.2.0'
 global.nameqr = 'YuriBotMD'
-global.namebot ='jim wo sung'
+global.namebot ='Gawr Gura'
 global.sessions = 'Sessions'
 global.jadi = 'JadiBots' 
 global.yukiJadibts = true
 
 global.packname = 'Gawr Gura'
 global.namebot = 'Gawr Gura'
-global.author = 'HAROLD Y 💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖 '
+global.author = '💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖 '
 
 
 global.namecanal = 'Gawr Gura'
