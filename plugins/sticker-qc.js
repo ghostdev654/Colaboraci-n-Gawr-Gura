@@ -23,8 +23,8 @@ let stiker = await sticker(buffer, false, global.packsticker, global.packsticker
 if (stiker) return conn.sendFile(m.chat, stiker, 'error.webp', '', m);
 }
 handler.help = ['qc'];
-handler.tags = ['sticker'];
+handler.tags = ['stickeres'];
 handler.group = true;
-handler.register = true
+handler.register = false
 handler.command = ['qc'];
 export default handler;
