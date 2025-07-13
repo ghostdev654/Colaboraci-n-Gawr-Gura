@@ -1,7 +1,7 @@
 
 
 <h1 align="center">
-  🌸 Commands of YuruYuri 🌸
+  🌸 Commands de gura  🌸
 </h1>
 
 <p align="center">
