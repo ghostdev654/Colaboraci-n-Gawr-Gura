@@ -27,7 +27,7 @@ let handler = async (m, { conn, text, usedPrefix }) => {
           link: link,
           nombre: nombre || 'Sin nombre',
           desarrollador: desarrollador || 'Sin desarrollador',
-          img: 'https://files.catbox.moe/dklg5y.jpg', 
+          img: 'https://files.catbox.moe/7h2tka.jpg', 
           calificacion: calificacion || 'Sin calificación',
           calificacionTexto: calificacionTexto || 'Sin calificación',
           link_desarrollador: `https://play.google.com/store/apps/developer?id=${desarrollador.split(" ").join('+')}`
@@ -60,7 +60,7 @@ let handler = async (m, { conn, text, usedPrefix }) => {
         externalAdReply: {
           title: resultados[0].nombre,
           body: `Resultados de búsqueda de Play Store - ${text}`,
-          thumbnailUrl: 'https://files.catbox.moe/dklg5y.jpg',
+          thumbnailUrl: 'https://files.catbox.moe/7h2tka.jpg',
           sourceUrl: resultados[0].link,
           mediaType: 1,
           renderLargerThumbnail: true
