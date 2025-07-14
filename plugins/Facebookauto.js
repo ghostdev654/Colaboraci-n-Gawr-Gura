@@ -43,7 +43,7 @@ const handler = async (m, { conn }) => {
             m.chat,
             {
                 video: { url: video },
-                caption: `${emoji} *Aquí tienes ฅ^•ﻌ•^ฅ.*`,
+                caption: `${emoji} *Aquí tienes vv.*`,
                 fileName: 'fb.mp4',
                 mimetype: 'video/mp4'
             },
@@ -60,6 +60,6 @@ handler.customPrefix = /https?:\/\/(www\.)?(facebook\.com|fb\.watch)\//i;
 handler.command = new RegExp;
 handler.group = true;
 handler.register = false;
-handler.limit = true;
+handler.limit = false;
 
 export default handler;
