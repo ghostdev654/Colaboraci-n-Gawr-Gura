@@ -27,7 +27,7 @@ global.author = '💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖 '
 
 global.namecanal = 'Gawr Gura'
 global.canal = 'https://whatsapp.com/channel/0029VbAmMiM96H4KgBHZUn1z'
-global.idcanal = '120363399729727124@newsletter '
+global.idcanal = '120363399729727124@newsletter'
 
 global.ch = {
 ch1: '120363399729727124@newsletter',
