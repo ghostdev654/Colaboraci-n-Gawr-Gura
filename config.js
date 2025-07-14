@@ -26,11 +26,11 @@ global.author = '💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖 '
 
 
 global.namecanal = 'Gawr Gura'
-global.canal = 'https://whatsapp.com/channel/0029Vb5atcVL7UVQwAB9tU2k'
-global.idcanal = '120363419172960653@newsletter'
+global.canal = 'https://whatsapp.com/channel/0029VbAmMiM96H4KgBHZUn1z'
+global.idcanal = '120363399729727124@newsletter '
 
 global.ch = {
-ch1: '120363419172960653@newsletter',
+ch1: '120363399729727124@newsletter',
 }
 
 global.multiplier = 69 
