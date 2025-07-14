@@ -1,89 +1,62 @@
-import fs from 'fs'
-import path from 'path'
-import fetch from 'node-fetch'
-import fluent from 'fluent-ffmpeg'
-import { fileTypeFromBuffer as fromBuffer } from 'file-type'
-import { addExif } from '../lib/sticker.js'
+import { sticker } from '../lib/sticker.js'
+import uploadFile from '../lib/uploadFile.js'
+import uploadImage from '../lib/uploadImage.js'
+import { webp2png } from '../lib/webp2mp4.js'
 
-let handler = async (m, { conn, args }) => {
-  let q = m.quoted ? m.quoted : m
-  let mime = (q.msg || q).mimetype || q.mediaType || ''
-  let buffer
-
+let handler = async (m, { conn, args, usedPrefix, command }) => {
+  let stiker = false
   try {
-    if (/image|video|webp|tgs|webm/g.test(mime) && q.download) {
-      if (/video|webm/.test(mime) && (q.msg || q).seconds > 11) {
-        return conn.reply(m.chat, '✦❀ Oops... Este sticker animado no puede durar más de *10* segundos ✿', m, rcanal)
+    let q = m.quoted ? m.quoted : m
+    let mime = (q.msg || q).mimetype || q.mediaType || ''
+    if (/webp|image|video/g.test(mime)) {
+      if (/video/g.test(mime) && (q.msg || q).seconds > 15) {
+        return m.reply(`✧ ¡El video no puede durar más de 15 segundos!...`)
       }
-      buffer = await q.download()
-    } else if (args[0] && isUrl(args[0])) {
-      const res = await fetch(args[0])
-      buffer = await res.buffer()
-    } else {
-      return conn.reply(m.chat, '✧ Responde con una *Imagen, Sticker, Video, Webm o Tgs* para convertirlo en sticker. ✿', m, rcanal)
+      let img = await q.download?.()
+
+      if (!img) {
+        return conn.reply(m.chat, `❀ Por favor, envía una imagen o video para hacer un sticker.`, m)
+      }
+
+      let out
+      try {
+        let userId = m.sender
+        let packstickers = global.db.data.users[userId] || {}
+        let texto1 = packstickers.text1 || global.packsticker
+        let texto2 = packstickers.text2 || global.packsticker2
+
+        stiker = await sticker(img, false, texto1, texto2)
+      } finally {
+        if (!stiker) {
+          if (/webp/g.test(mime)) out = await webp2png(img)
+          else if (/image/g.test(mime)) out = await uploadImage(img)
+          else if (/video/g.test(mime)) out = await uploadFile(img)
+          if (typeof out !== 'string') out = await uploadImage(img)
+          stiker = await sticker(false, out, global.packsticker, global.packsticker2)
+        }
+      }
+    } else if (args[0]) {
+      if (isUrl(args[0])) {
+        stiker = await sticker(false, args[0], global.packsticker, global.packsticker2)
+      } else {
+        return m.reply(`⚠︎ El URL es incorrecto...`)
+      }
     }
-
-    await m.react('🕓')
-
-    const stickerData = await toWebp(buffer)
-    const finalSticker = await addExif(stickerData, packname, author)
-
-    await conn.sendFile(m.chat, finalSticker, 'sticker.webp', '☁︎ Aquí tienes tu sticker ✦', m)
-    await m.react('✅')
-
-  } catch (e) {
-    await m.react('✖️')
-    console.error('❀ Error al crear sticker:', e)
+  } finally {
+    if (stiker) {
+      conn.sendFile(m.chat, stiker, 'sticker.webp', '', m)
+    } else {
+      return conn.reply(m.chat, `❀ Por favor, envía una imagen o video para hacer un sticker.`, m)
+    }
   }
 }
 
-handler.help = ['sticker']
+handler.help = ['stiker <img>', 'sticker <url>']
 handler.tags = ['sticker']
 handler.command = ['s', 'sticker', 'stiker']
 
 export default handler
 
-async function toWebp(buffer, opts = {}) {
-  const { ext } = await fromBuffer(buffer)
-  if (!/(png|jpg|jpeg|mp4|mkv|m4p|gif|webp|webm|tgs)/i.test(ext)) throw 'Media no compatible.'
-
-  const tempDir = global.tempDir || './tmp'
-  const input = path.join(tempDir, `${Date.now()}.${ext}`)
-  const output = path.join(tempDir, `${Date.now()}.webp`)
-
-  fs.writeFileSync(input, buffer)
-
-  const aspectRatio = opts.isFull
-    ? `scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease`
-    : `scale='if(gt(iw,ih),-1,299):if(gt(iw,ih),299,-1)', crop=299:299:exact=1`
-
-  const options = [
-    '-vcodec', 'libwebp',
-    '-vf', `${aspectRatio}, fps=15, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff [p]; [b][p] paletteuse`,
-    ...(ext.match(/(mp4|mkv|m4p|gif|webm)/) 
-      ? ['-loop', '0', '-ss', '00:00:00', '-t', '00:00:10', '-preset', 'default', '-an', '-vsync', '0']
-      : []
-    )
-  ]
-
-  return new Promise((resolve, reject) => {
-    fluent(input)
-      .addOutputOptions(options)
-      .toFormat('webp')
-      .save(output)
-      .on('end', () => {
-        const result = fs.readFileSync(output)
-        fs.unlinkSync(input)
-        fs.unlinkSync(output)
-        resolve(result)
-      })
-      .on('error', (err) => {
-        fs.unlinkSync(input)
-        reject(err)
-      })
-  })
-}
-
-function isUrl(text) {
-  return /^https?:\/\/\S+\.(jpg|jpeg|png|gif|webp)$/i.test(text)
+const isUrl = (text) => {
+  return text.match(new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)(jpe?g|gif|png)/, 'gi'))
 }
