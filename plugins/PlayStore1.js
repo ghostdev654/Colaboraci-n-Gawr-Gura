@@ -11,7 +11,7 @@ let handler = async (m, { conn, text, usedPrefix }) => {
 
   const PlayStore = async (search) => {
     try {
-      const { data } = await axios.get(`https://play.google.com/store/search?q=${search}&c=apps`);
+      const { data } = await axios.get(`https://nightapi.is-a.dev/api/stalk?platform=gplay&name=whatsapp${search}&c=apps`);
       const resultados = [];
       const $ = cheerio.load(data);
       
