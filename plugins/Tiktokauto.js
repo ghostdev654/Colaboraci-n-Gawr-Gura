@@ -34,7 +34,7 @@ handler.customPrefix = /https?:\/\/(www\.)?(tiktok\.com|vm\.tiktok\.com)\//i;
 handler.command = new RegExp;
 handler.group = true;
 handler.register = false;
-handler.limit = true;
+handler.limit = false;
 
 export default handler;
 
