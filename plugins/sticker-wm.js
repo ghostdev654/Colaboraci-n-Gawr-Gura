@@ -23,6 +23,6 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 handler.help = ['wm'];
 handler.tags = ['tools'];
 handler.command = ['take', 'robar', 'wm'];
-handler.register = true;
+handler.register = false;
 
 export default handler;
