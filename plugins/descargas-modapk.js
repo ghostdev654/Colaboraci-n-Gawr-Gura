@@ -72,8 +72,8 @@ delete userRequests[m.sender];
 handler.help = ['apk', 'apkmod'];
 handler.tags = ['downloader'];
 handler.command = /^(apkmod|apk|modapk|dapk2|aptoide|aptoidedl)$/i;
-handler.register = true;
-handler.limit = 2;
+handler.register = false;
+handler.limit = 10;
 
 export default handler;
 
