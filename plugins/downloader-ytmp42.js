@@ -40,27 +40,12 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
       `> ✐ *Publicado »* ${ago}\n` +
       `> 🜸 *Link »* ${url}`
 
-    const thumb = (await conn.getFile(thumbnail))?.data
-    const JT = {
-      contextInfo: {
-        externalAdReply: {
-          title: namebot,
-          body: '',
-          mediaType: 1,
-          previewType: 0,
-          mediaUrl: url,
-          sourceUrl: 'theadonix-api.vercel.app',
-          thumbnail: thumb,
-          renderLargerThumbnail: true,
-        },
-      },
-    }
-
-    await conn.reply(m.chat, infoMessage, m, JT)
+    // Enviar la miniatura con la info
+    await conn.sendFile(m.chat, thumbnail, 'thumb.jpg', infoMessage, m)
 
     if (['play', 'yta', 'ytmp3', 'playaudio'].includes(command)) {
       try {
-        const r = await fetch(`https://theadonix-api.vercel.app/api/ytmp3?url=${encodeURIComponent(url)}`)
+        const r = await fetch(`https://apiadonix.vercel.app/api/ytmp3?url=${encodeURIComponent(url)}`)
         const json = await r.json()
         if (!json?.result?.audio) throw new Error('❌ No se pudo generar el audio.')
 
@@ -77,7 +62,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     } else if (['play2', 'ytv', 'ytmp4', 'mp4'].includes(command)) {
       try {
-        const r = await fetch(`https://theadonix-api.vercel.app/api/ytmp4?url=${encodeURIComponent(url)}`)
+        const r = await fetch(`https://apiadonix.vercel.app/api/ytmp4?url=${encodeURIComponent(url)}`)
         const json = await r.json()
         if (!json?.result?.video) throw new Error('❌ No se pudo generar el video.')
 
@@ -85,7 +70,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
           video: { url: json.result.video },
           mimetype: 'video/mp4',
           fileName: json.result.filename || `${json.result.title}.mp4`,
-          caption: `🔥 *${json.result.title || 'Video'}*`
+          caption: `${json.result.title || 'Video'} 🌟`
         }, { quoted: m })
 
       } catch (e) {
