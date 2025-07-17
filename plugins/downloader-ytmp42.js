@@ -1,5 +1,9 @@
 import fetch from "node-fetch"
 import yts from "yt-search"
+import { exec } from "child_process"
+import fs from "fs"
+import path from "path"
+import os from "os"
 
 const youtubeRegexID = /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/
 
@@ -40,37 +44,55 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
       `> ✐ *Publicado »* ${ago}\n` +
       `> 🜸 *Link »* ${url}`
 
-    // Enviar la miniatura con la info
     await conn.sendFile(m.chat, thumbnail, 'thumb.jpg', infoMessage, m)
 
     if (['play', 'yta', 'ytmp3', 'playaudio'].includes(command)) {
       try {
         const r = await fetch(`https://apiadonix.vercel.app/api/ytmp3?url=${encodeURIComponent(url)}`)
         const json = await r.json()
+
         if (!json?.result?.audio) throw new Error('❌ No se pudo generar el audio.')
 
+        const input = path.join(os.tmpdir(), `input-${Date.now()}.mp3`)
+        const output = path.join(os.tmpdir(), `output-${Date.now()}.mp3`)
+
+        const res = await fetch(json.result.audio)
+        const buffer = await res.arrayBuffer()
+        fs.writeFileSync(input, Buffer.from(buffer))
+
+        await new Promise((resolve, reject) => {
+          exec(`ffmpeg -i "${input}" -b:a 192k -ar 44100 -y "${output}"`, (err, stdout, stderr) => {
+            if (err) return reject(err)
+            resolve()
+          })
+        })
+
         await conn.sendMessage(m.chat, {
-          audio: { url: json.result.audio },
+          audio: fs.readFileSync(output),
           mimetype: 'audio/mpeg',
-          fileName: json.result.filename || `${json.result.title}.mp3`,
-          ptt: true
+          fileName: json.result.filename || `${json.result.title}.mp3`
         }, { quoted: m })
 
+        fs.unlinkSync(input)
+        fs.unlinkSync(output)
+
       } catch (e) {
-        return conn.reply(m.chat, '📍 No se pudo enviar el audio. Tal vez es muy pesado.', m)
+        return conn.reply(m.chat, '📍 No se pudo enviar el audio. Tal vez es muy pesado o hubo error.', m)
       }
 
     } else if (['play2', 'ytv', 'ytmp4', 'mp4'].includes(command)) {
       try {
         const r = await fetch(`https://apiadonix.vercel.app/api/ytmp4?url=${encodeURIComponent(url)}`)
         const json = await r.json()
-        if (!json?.result?.video) throw new Error('❌ No se pudo generar el video.')
+
+        const videoUrl = json?.result?.download || json?.result?.video
+        if (!videoUrl) throw new Error('❌ No se pudo generar el video.')
 
         await conn.sendMessage(m.chat, {
-          video: { url: json.result.video },
+          video: { url: videoUrl },
           mimetype: 'video/mp4',
           fileName: json.result.filename || `${json.result.title}.mp4`,
-          caption: `${json.result.title || 'Video'} 🌟`
+          caption: `🔥 *${json.result.title || 'Video'}*`
         }, { quoted: m })
 
       } catch (e) {
