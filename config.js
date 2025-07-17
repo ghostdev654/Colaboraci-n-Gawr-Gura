@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url'
 
 global.owner = [
   ['573133374132', '💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖 ', true],
+  ['50493732693', 'Ado', true],
 ]
 
 
