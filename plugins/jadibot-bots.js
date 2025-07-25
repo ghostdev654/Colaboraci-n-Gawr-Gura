@@ -15,7 +15,7 @@ let handler = async (m, { conn }) => {
   let formatUptime = clockString(uptime)
   let totalUsers = uniqueUsers.size
   let txt = `❀ 「 *Subs - Bots * 」❀\n\n`
-  txt += `✦ *Bot Principal:* 𝙎𝙃𝙊𝙔𝙊 𝙃𝙄𝙉𝘼𝙏𝘼 ოძ  𝘽 ꂦ Ꮏ\n`
+  txt += `✦ *Bot Principal:*gawr gura ოძ  𝘽 ꂦ Ꮏ\n`
   txt += `✦ *Tiempo Activa:* ${formatUptime}\n`
   txt += `✦ *Subs Conectados:* ${totalUsers || 0}\n`
   if (totalUsers > 0) {
