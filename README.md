@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="https://files.catbox.moe/igrw5r.jpg" width="320" alt="Ultimate Shark Bot">
+  <img src="[https://files.catbox.moe/igrw5r.jpg](https://www.google.com/imgres?q=IMAGENES%20DE%20GAWR%20GURA&imgurl=https%3A%2F%2Fmultimedia.easeus.com%2Fimages%2Fmultimedia%2Fvoice-changer%2Fresources%2Fgawr-gura.jpg&imgrefurl=https%3A%2F%2Fmultimedia.easeus.com%2Fes%2Fmodulador-de-voz%2Fvoz-de-la-ia-de-gawr-gura.html&docid=RFXZ0RdXDueFNM&tbnid=xS5fYlxEL0zoRM&vet=12ahUKEwjX4-iFptmOAxVKs4QIHc5qDPMQM3oECHwQAA..i&w=527&h=684&hcb=2&ved=2ahUKEwjX4-iFptmOAxVKs4QIHc5qDPMQM3oECHwQAA)" width="320" alt="Ultimate Shark Bot">
 </p>
 
 <h1 align="center">
