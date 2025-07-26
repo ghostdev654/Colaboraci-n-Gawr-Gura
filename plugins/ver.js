@@ -1,44 +1,50 @@
 const handler = async (m, { conn, usedPrefix, command }) => {
-  if (!m.quoted) throw `✳️ Responde a una imagen o video de "ver una vez" con *${usedPrefix + command}*`;
-
-  let message = m.quoted.msg || {};
-  let type;
-  let content;
+  if (!m.quoted) throw `✳️ Responde a una imagen, video, sticker o audio (incluyendo "ver una vez") con *${usedPrefix + command}*`;
 
   try {
-    if (message?.viewOnceMessageV2) {
-      content = message.viewOnceMessageV2.message;
-    } else if (message?.viewOnceMessage) {
-      content = message.viewOnceMessage.message;
+    let q = m.quoted;
+    let msg = q.msg || {};
+    let tipo;
+    let contenido;
+
+    // Soporte para mensajes de "ver una vez"
+    if (msg?.viewOnceMessageV2) {
+      contenido = msg.viewOnceMessageV2.message;
+    } else if (msg?.viewOnceMessage) {
+      contenido = msg.viewOnceMessage.message;
     } else {
-      throw '⚠️ El mensaje no es de tipo "ver una vez".';
+      contenido = msg;
     }
 
-    type = Object.keys(content)[0]; // imageMessage o videoMessage
+    tipo = Object.keys(contenido || {})[0];
 
-    const mediaMessage = {
-      key: m.quoted.key,
+    if (!tipo) throw '❌ No se pudo detectar el tipo de contenido.';
+
+    const mensajeMedia = {
+      key: q.key,
       message: {
-        [type]: content[type],
-      },
+        [tipo]: contenido[tipo]
+      }
     };
 
-    const filePath = await conn.downloadAndSaveMediaMessage(mediaMessage);
-    const fileName = type === 'imageMessage' ? 'imagen.jpg' : 'video.mp4';
-    const texto = type === 'imageMessage'
-      ? '🖼️ Aquí tienes la imagen vista una vez.'
-      : '🎞️ Aquí tienes el video visto una vez.';
+    const ruta = await conn.downloadAndSaveMediaMessage(mensajeMedia);
+    const nombre = tipo.includes('image') ? 'imagen.jpg'
+                : tipo.includes('video') ? 'video.mp4'
+                : tipo.includes('audio') ? 'audio.mp3'
+                : tipo.includes('sticker') ? (contenido[tipo].isAnimated ? 'sticker.mp4' : 'sticker.webp')
+                : 'archivo';
 
-    await conn.sendFile(m.chat, filePath, fileName, texto, m);
-  } catch (err) {
-    console.error(err);
-    throw '❌ No se pudo recuperar la imagen o video. Asegúrate de responder correctamente al mensaje "ver una vez".';
+    const texto = `📤 Archivo reenviado correctamente.`;
+
+    await conn.sendFile(m.chat, ruta, nombre, texto, m);
+  } catch (e) {
+    console.error(e);
+    throw '❌ Ocurrió un error al reenviar el archivo. Asegúrate de responder correctamente a un mensaje con contenido multimedia.';
   }
 };
 
-handler.help = ['ver'];
-handler.tags = ['herramientas', 'descargas'];
-handler.command = /^ver$/i;
+handler.help = ['reenviar'];
+handler.tags = ['herramientas', 'utilidades'];
+handler.command = /^reenviar$/i;
 
 export default handler;
-
