@@ -2,49 +2,53 @@ const handler = async (m, { conn, usedPrefix, command }) => {
   if (!m.quoted) throw `✳️ Responde a una imagen, video, sticker o audio (incluyendo "ver una vez") con *${usedPrefix + command}*`;
 
   try {
-    let q = m.quoted;
-    let msg = q.msg || {};
+    // Detectar si es "ver una vez"
+    let quoted = m.quoted;
+    let qmsg = quoted.msg || quoted;
     let tipo;
     let contenido;
 
-    // Soporte para mensajes de "ver una vez"
-    if (msg?.viewOnceMessageV2) {
-      contenido = msg.viewOnceMessageV2.message;
-    } else if (msg?.viewOnceMessage) {
-      contenido = msg.viewOnceMessage.message;
+    if (qmsg.message) {
+      // viewOnceMessage
+      if (qmsg.message?.viewOnceMessage) {
+        contenido = qmsg.message.viewOnceMessage.message;
+      } else if (qmsg.message?.viewOnceMessageV2) {
+        contenido = qmsg.message.viewOnceMessageV2.message;
+      } else {
+        contenido = qmsg.message;
+      }
+    } else if (quoted.message) {
+      contenido = quoted.message;
     } else {
-      contenido = msg;
+      contenido = quoted;
     }
 
     tipo = Object.keys(contenido || {})[0];
+    if (!tipo) throw '⚠️ Este mensaje no contiene multimedia válida.';
 
-    if (!tipo) throw '❌ No se pudo detectar el tipo de contenido.';
-
-    const mensajeMedia = {
-      key: q.key,
+    const mediaMsg = {
+      key: quoted.key,
       message: {
         [tipo]: contenido[tipo]
       }
     };
 
-    const ruta = await conn.downloadAndSaveMediaMessage(mensajeMedia);
+    const ruta = await conn.downloadAndSaveMediaMessage(mediaMsg);
     const nombre = tipo.includes('image') ? 'imagen.jpg'
                 : tipo.includes('video') ? 'video.mp4'
                 : tipo.includes('audio') ? 'audio.mp3'
                 : tipo.includes('sticker') ? (contenido[tipo].isAnimated ? 'sticker.mp4' : 'sticker.webp')
                 : 'archivo';
 
-    const texto = `📤 Archivo reenviado correctamente.`;
-
-    await conn.sendFile(m.chat, ruta, nombre, texto, m);
+    await conn.sendFile(m.chat, ruta, nombre, `📤 *Archivo reenviado*`, m);
   } catch (e) {
     console.error(e);
-    throw '❌ Ocurrió un error al reenviar el archivo. Asegúrate de responder correctamente a un mensaje con contenido multimedia.';
+    throw `❌ Ocurrió un error. Asegúrate de responder a una imagen, video, sticker o audio (incluso ver una vez).\n\n🔎 Error: ${e.message}`;
   }
 };
 
 handler.help = ['reenviar'];
-handler.tags = ['herramientas', 'utilidades'];
+handler.tags = ['herramientas'];
 handler.command = /^reenviar$/i;
 
 export default handler;
