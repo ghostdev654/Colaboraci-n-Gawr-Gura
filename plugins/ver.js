@@ -1,29 +1,33 @@
 const handler = async (m, { conn, usedPrefix, command }) => {
-  if (!m.quoted) throw `✳️ Responde a una imagen o video de "ver una vez" con *${usedPrefix + command}*`;
+  if (!m.quoted) throw `✳️ Responde a una imagen o video enviado como "ver una vez" usando *${usedPrefix + command}*`;
+
+  const quotedMsg = m.quoted?.msg || {};
+  const type = Object.keys(quotedMsg || {})[0]; // imageMessage o videoMessage
+  const mediaData = quotedMsg?.[type];
+
+  if (!mediaData || !mediaData.viewOnce) {
+    throw '⚠️ Ese mensaje no es de tipo "ver una vez". Asegúrate de responder directamente a una imagen o video enviado con esa opción.';
+  }
 
   try {
-    const viewOnce = m.quoted?.msg?.viewOnceMessageV2 || m.quoted?.msg?.viewOnceMessage || null;
+    const buffer = await m.quoted.download();
+    const mime = m.quoted.mime || '';
 
-    if (!viewOnce) throw '⚠️ Ese mensaje no es de tipo "ver una vez".';
-
-    const message = viewOnce.message;
-    const type = Object.keys(message)[0]; // 'imageMessage' o 'videoMessage'
-    const media = await conn.downloadAndSaveMediaMessage({ key: m.quoted.key, message }, 'ver-unica');
-
-    const fileName = type === 'imageMessage' ? 'imagen.jpg' : 'video.mp4';
-    const texto = type === 'imageMessage'
-      ? '🖼️ Aquí tienes la imagen de una sola vista.'
-      : '🎞️ Aquí tienes el video de una sola vista.';
-
-    await conn.sendFile(m.chat, media, fileName, texto, m);
+    if (/image/.test(mime)) {
+      await conn.sendFile(m.chat, buffer, 'ver.jpg', '🖼️ Aquí tienes la imagen vista una vez.', m);
+    } else if (/video/.test(mime)) {
+      await conn.sendFile(m.chat, buffer, 'ver.mp4', '🎞️ Aquí tienes el video visto una vez.', m);
+    } else {
+      throw '❌ No es una imagen o video válido.';
+    }
   } catch (err) {
     console.error(err);
-    throw '❌ No se pudo extraer la imagen o video. Asegúrate de responder correctamente.';
+    throw '❌ Ocurrió un error al recuperar el archivo. Puede que no sea un mensaje compatible o fue enviado hace mucho.';
   }
 };
 
 handler.help = ['ver'];
-handler.tags = ['descargas', 'herramientas'];
+handler.tags = ['descargas', 'utilidades'];
 handler.command = /^ver$/i;
 
 export default handler;
