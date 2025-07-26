@@ -1,4 +1,4 @@
-console.log(' Yuru Yuri...')
+console.log(' ALGO SE ACERCA...')
 
 import { join, dirname } from 'path'
 import { createRequire } from 'module'
