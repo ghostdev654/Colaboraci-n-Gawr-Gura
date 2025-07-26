@@ -24,12 +24,10 @@
 
 ---
 
-### 🎮 Comandos Mágicos (clic para ver)
+# 🎮 Comandos Mágicos (clic para ver)
 
-<details>
-  <summary>📜 Mostrar comandos</summary>
 
-```bash
+
 🎲 Juegos: piedra papel o tijera, adivina el número, ruleta emoji, y más~
 📥 Descargas: YouTube, TikTok, Facebook, Instagram
 📸 Stickers: convertir a imagen, video o hacer stickers nuevos
