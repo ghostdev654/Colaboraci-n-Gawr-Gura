@@ -1,54 +1,38 @@
-const handler = async (m, { conn, usedPrefix, command }) => {
-  if (!m.quoted) throw `✳️ Responde a una imagen, video, sticker o audio (incluyendo "ver una vez") con *${usedPrefix + command}*`;
+import fs from 'fs';
+import path from 'path';
+
+const handler = async (m, { conn }) => {
+  if (!m.quoted) throw '✳️ Responde a una imagen o video de "ver una vez".';
+
+  let q = m.quoted;
+  let mime = q?.mime || '';
+  let isViewOnce = !!(q.msg?.viewOnceMessage || q.msg?.viewOnceMessageV2);
+
+  if (!isViewOnce) throw '⚠️ Ese mensaje no es de tipo "ver una vez".';
 
   try {
-    // Detectar si es "ver una vez"
-    let quoted = m.quoted;
-    let qmsg = quoted.msg || quoted;
-    let tipo;
-    let contenido;
+    const buffer = await q.download();
+    if (!buffer) throw '❌ No se pudo descargar el contenido.';
 
-    if (qmsg.message) {
-      // viewOnceMessage
-      if (qmsg.message?.viewOnceMessage) {
-        contenido = qmsg.message.viewOnceMessage.message;
-      } else if (qmsg.message?.viewOnceMessageV2) {
-        contenido = qmsg.message.viewOnceMessageV2.message;
-      } else {
-        contenido = qmsg.message;
-      }
-    } else if (quoted.message) {
-      contenido = quoted.message;
-    } else {
-      contenido = quoted;
-    }
+    let extension = mime.includes('image') ? '.jpg'
+                  : mime.includes('video') ? '.mp4'
+                  : '';
 
-    tipo = Object.keys(contenido || {})[0];
-    if (!tipo) throw '⚠️ Este mensaje no contiene multimedia válida.';
+    if (!extension) throw '❌ Solo se soportan imágenes o videos de ver una vez.';
 
-    const mediaMsg = {
-      key: quoted.key,
-      message: {
-        [tipo]: contenido[tipo]
-      }
-    };
+    const filePath = path.join('./temp', `${Date.now()}${extension}`);
+    fs.writeFileSync(filePath, buffer);
 
-    const ruta = await conn.downloadAndSaveMediaMessage(mediaMsg);
-    const nombre = tipo.includes('image') ? 'imagen.jpg'
-                : tipo.includes('video') ? 'video.mp4'
-                : tipo.includes('audio') ? 'audio.mp3'
-                : tipo.includes('sticker') ? (contenido[tipo].isAnimated ? 'sticker.mp4' : 'sticker.webp')
-                : 'archivo';
-
-    await conn.sendFile(m.chat, ruta, nombre, `📤 *Archivo reenviado*`, m);
+    await conn.sendFile(m.chat, filePath, `archivo${extension}`, `📤 Aquí tienes el archivo.`, m);
+    fs.unlinkSync(filePath); // Borrar temporal después de enviar
   } catch (e) {
     console.error(e);
-    throw `❌ Ocurrió un error. Asegúrate de responder a una imagen, video, sticker o audio (incluso ver una vez).\n\n🔎 Error: ${e.message}`;
+    throw '❌ Hubo un error al reenviar el archivo.';
   }
 };
 
-handler.help = ['reenviar'];
-handler.tags = ['herramientas'];
-handler.command = /^reenviar$/i;
+handler.help = ['ver'];
+handler.tags = ['utilidades'];
+handler.command = /^ver$/i;
 
 export default handler;
