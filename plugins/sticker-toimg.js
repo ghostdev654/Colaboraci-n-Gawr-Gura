@@ -1,17 +1,23 @@
-import { webp2png } from '../lib/webp2mp4.js'
+import { webp2png } from '../lib/webp2mp4.js';
+import uploadImage from '../lib/uploadImage.js';
 
-let handler = async (m, { conn, usedPrefix, command }) => {
-    const notStickerMessage = `${emoji} Debes citar un sticker para convertir a imagen.`
-    const q = m.quoted || m
-    const mime = q.mediaType || ''
-    if (!/sticker/.test(mime)) return m.reply(notStickerMessage)
-    const media = await q.download()
-    let out = await webp2png(media).catch(_ => null) || Buffer.alloc(0)
-    await conn.sendFile(m.chat, out, 'output.png', null, m)
-}
+const handler = async (m, { conn, usedPrefix, command }) => {
+  // Verifica si está respondiendo a un sticker
+  if (!m.quoted || m.quoted.mtype !== 'stickerMessage')
+    throw `✳️ Responde a un sticker con *${usedPrefix + command}* para convertirlo a imagen.`;
 
-handler.help = ['toimg (reply)']
-handler.tags = ['sticker']
-handler.command = ['toimg', 'img', 'jpg']
+  try {
+    const sticker = await m.quoted.download();
+    const imageUrl = await webp2png(sticker);
+    conn.sendFile(m.chat, imageUrl, 'sticker.png', '✅ Aquí tienes tu sticker convertido a imagen.', m);
+  } catch (e) {
+    console.error(e);
+    throw '❌ Error al convertir el sticker. Asegúrate de que sea un sticker válido.';
+  }
+};
 
-export default handler
+handler.help = ['toimg'];
+handler.tags = ['herramientas', 'convertidor'];
+handler.command = /^toimg$/i;
+
+export default handler;
