@@ -10,13 +10,13 @@ import cfonts from 'cfonts'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const require = createRequire(__dirname)
 
-cfonts.say('Yuru\nYuriMD', {
+cfonts.say('gwara\ngura', {
   font: 'block',
   align: 'center',
   gradient: ['cyan', 'blue']
 })
 
-cfonts.say('WhatsApp Multi-Bot Engine', {
+cfonts.say('VENGO DE ATLANTIS PA TU CASA', {
   font: 'simple',
   align: 'center',
   gradient: ['blue', 'white']
