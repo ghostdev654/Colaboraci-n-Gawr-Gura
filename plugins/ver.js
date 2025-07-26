@@ -1,28 +1,26 @@
 const handler = async (m, { conn, usedPrefix, command }) => {
-  const quoted = m.quoted;
+  if (!m.quoted) throw `✳️ Responde a una imagen o video enviado como "ver una vez" con *${usedPrefix + command}*`;
 
-  if (!quoted)
-    throw `❗Responde a un mensaje que contenga una imagen o video enviado para ver una sola vez usando *${usedPrefix + command}*`;
+  const msg = m.quoted.msg || {};
+  const type = Object.keys(msg)[0]; // Ej: 'imageMessage' o 'videoMessage'
 
-  const type = quoted.mtype || '';
+  const isViewOnce = !!msg[type]?.viewOnce;
 
-  if (!/viewOnce/i.test(JSON.stringify(quoted.msg)))
-    throw '⚠️ Ese mensaje no es de tipo "ver una vez".';
+  if (!isViewOnce) throw '⚠️ El mensaje no es una imagen/video de "ver una vez".';
 
   try {
-    const media = await quoted.download();
-    const mime = quoted?.mime || '';
+    const media = await m.quoted.download();
 
-    if (/image/.test(mime)) {
-      await conn.sendFile(m.chat, media, 'ver.jpg', '🖼️ Aquí tienes la imagen vista una vez.', m);
-    } else if (/video/.test(mime)) {
-      await conn.sendFile(m.chat, media, 'ver.mp4', '🎞️ Aquí tienes el video visto una vez.', m);
-    } else {
-      throw '❌ No es una imagen o video válido.';
-    }
+    const mime = m.quoted.mime || '';
+    const filename = mime.includes('image') ? 'ver.jpg' : 'ver.mp4';
+    const texto = mime.includes('image')
+      ? '🖼️ Aquí tienes la imagen vista una vez.'
+      : '🎞️ Aquí tienes el video visto una vez.';
+
+    await conn.sendFile(m.chat, media, filename, texto, m);
   } catch (err) {
     console.error(err);
-    throw '❌ Ocurrió un error al intentar recuperar el archivo.';
+    throw '❌ Ocurrió un error al recuperar la imagen o video.';
   }
 };
 
