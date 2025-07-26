@@ -1,38 +1,14 @@
-import { Sticker } from 'wa-sticker-formatter';
-import fetch from 'node-fetch';
+import { sticker } from '../lib/sticker.js'
 
-let handler = async (m, { conn, text, usedPrefix, command }) => {
-    if (m.quoted && m.quoted.text) {
-        text = m.quoted.text || 'Que';
-    } else if (!text) {
-        return m.reply('🌿 Responde a un mensaje o ingresa un texto.');
-    }
-    try {
-        await m.react(rwait)
-        const apiUrl = `https://fastrestapis.fasturl.cloud/maker/brat/simple?text=${encodeURIComponent(text)}&theme=white`;
-        
-        let stiker = await createSticker(apiUrl, '', footer, 100);
-        if (stiker) await conn.sendFile(m.chat, stiker, '', '', m);
-        m.react(done)
-    } catch (e) {
-        console.error(e);
-        m.reply('Se produjo un error, inténtelo de nuevo más tarde!');
-    }
-};
-
-handler.help = ['brat'];
-handler.tags = ['sticker'];
-handler.command = /^(brat)$/i;
-export default handler;
-
-async function createSticker(url, packName, authorName, quality) {
-    let res = await fetch(url);
-    let buffer = await res.buffer(); 
-    let stickerMetadata = {
-        type: 'full',
-        pack: packName,
-        author: authorName,
-        quality: 100
-    };
-    return (new Sticker(buffer, stickerMetadata)).toBuffer();
+let handler = async (m, { conn, text, command }) => {
+let user = global.db.data.users[m.sender]
+let f = user.packname || global.packname
+let g = (user.packname && user.author ? user.author : (user.packname && !user.author ? '' : global.author))
+let stiker = await sticker(null, global.API('caliphdev', `/api/brat`, { text: text }), f, g)
+if (stiker) return conn.sendFile(m.chat, stiker, 'sticker.webp', '', m)
+throw stiker.toString()
 }
+handler.help = ['brat <texto>']
+handler.tags = ['sticker']
+handler.command = /^brat$/i
+export default handler
