@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 
-// 2,000 decoraciones únicas para Gawr Gura: olas, tiburones, kawaii, mar
+// Decoraciones duplicadas (Gawr Gura)
 const DECORACIONES = Array.from({ length: 2000 }, (_, i) => {
     const shark = "🦈";
     const wave = "🌊";
@@ -8,8 +8,11 @@ const DECORACIONES = Array.from({ length: 2000 }, (_, i) => {
     const star = "⭐";
     const fish = "🐟";
     const bubble = "🫧";
-    const kawaii = ["(｡•̀ᴗ-)✧", "（＾・ω・＾❁）", "(｡♥‿♥｡)", "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧", "(っ˘ω˘ς )", "≧◡≦", "(。U⁄ ⁄ω⁄ ⁄ U。)", "(*≧ω≦)", "( ˘▽˘)っ♨", "( ˘▽˘)っ♨"];
-    // patrones alternos
+    const kawaii = [
+        "(｡•̀ᴗ-)✧", "（＾・ω・＾❁）", "(｡♥‿♥｡)", "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧", 
+        "(っ˘ω˘ς )", "≧◡≦", "(。U⁄ ⁄ω⁄ ⁄ U。)", "(*≧ω≦)", 
+        "( ˘▽˘)っ♨", "( ˘▽˘)っ♨"
+    ];
     const patterns = [
         `${wave}${shark}${bubble}${shark}${wave}${i}`,
         `${star}${bubble}${heart}${shark}${wave}${fish}${star}`,
@@ -64,10 +67,26 @@ const IMAGENES = [
     "https://i.imgur.com/6g4w7Xy.jpg"
 ];
 
-// Genera una decoración y su imagen asociada
-function randomGuraDeco(i) {
-    const idx = Math.floor(Math.random() * DECORACIONES.length);
-    return { ...DECORACIONES[idx], img: IMAGENES[idx % IMAGENES.length], idx };
+// Genera líneas de código aleatorias
+function generarCodigoAleatorio() {
+    const palabras = [
+        "let", "const", "function", "return", "async", "await", "class", "if", "else", "switch",
+        "case", "break", "import", "export", "default", "console.log", "Math.random", "try", "catch"
+    ];
+    const simbolos = ["=", "==", "===", "=>", "+", "-", "*", "/", "%", "&&", "||", "!", "++", "--", ".", ","];
+    const lineas = [];
+    for (let i = 0; i < 10; i++) {
+        const linea = [];
+        for (let j = 0; j < Math.floor(Math.random() * 5) + 3; j++) {
+            if (Math.random() > 0.5) {
+                linea.push(palabras[Math.floor(Math.random() * palabras.length)]);
+            } else {
+                linea.push(simbolos[Math.floor(Math.random() * simbolos.length)]);
+            }
+        }
+        lineas.push(linea.join(" "));
+    }
+    return lineas.join("\n");
 }
 
 let handler = async (m, { conn, usedPrefix, text, args, command }) => {
@@ -77,88 +96,34 @@ let handler = async (m, { conn, usedPrefix, text, args, command }) => {
         return conn.sendMessage(m.chat, { text: `El comando ${command} no existe.` });
     }
 
-    let list = [{
-        displayName: "💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖 - Creador de Gawr Gura",
-        vcard: `BEGIN:VCARD\nVERSION:3.0\nFN: 💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖  - Bot Developer\nitem1.TEL;waid=573133374132:573133374132\nitem1.X-ABLabel:Número\nitem2.ADR:;;Colombia;;;;\nitem2.X-ABLabel:País\nEND:VCARD`,
-    }];
+    // Simulación de extracción de información
+    let sent = await conn.sendMessage(m.chat, { text: "🔍 *Extrayendo información...*\n" }, { quoted: m });
+    const TIEMPO_EXTRACCION = 10 * 1000; // 10 segundos
+    const INTERVALO = 1000; // Cada 1 segundo
+    let tiempoTranscurrido = 0;
 
-    // Textos mejorados
-    function textoCreador(deco) {
-        return `${deco.arriba}
-${deco.centro} *👑 Contacto Oficial del Creador 👑*
-${deco.abajo}
-
-${deco.centro} *Nombre:* 💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖
-${deco.centro} *País:* 🇨🇴 Colombia
-${deco.centro} *Rol:* Desarrollador de Gawr Gura Bot
-
-${deco.centro} “¡Hola! Soy el creador de *Gawr Gura Bot*, un proyecto lleno de azul y tiburones.
-${deco.centro} Si tienes ideas, encontraste un bug o quieres apoyar este mar de alegría, mándame un mensaje.
-${deco.centro} ¡Gracias por surfear estas aguas sharky conmigo! 🌊🦈
-
-${deco.centro} _¡Aru~! Shark power~_`;
-    }
-
-    // Primer envío
-    let deco = randomGuraDeco(0);
-    let texto = textoCreador(deco);
-
-    await conn.sendMessage(m.chat, {
-        contacts: {
-            displayName: `${list.length} Contacto`,
-            contacts: list
-        },
-        contextInfo: {
-            externalAdReply: {
-                showAdAttribution: true,
-                title: 'Gawr Gura - Bot ',
-                body: 'Creador: 💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖 ',
-                thumbnailUrl: deco.img,
-                sourceUrl: 'https://github.com',
-                mediaType: 1,
-                renderLargerThumbnail: true
-            }
+    const actualizarExtraccion = async () => {
+        if (tiempoTranscurrido >= TIEMPO_EXTRACCION) {
+            mostrarInformacion();
+            return;
         }
-    }, { quoted: m });
-
-    // Mensaje decorado editable
-    let sent = await conn.sendMessage(m.chat, { text: texto }, { quoted: m });
-
-    // Animación: cambia decoración e imagen cada 5 segundos por 15 minutos
-    const TIEMPO_LIMITE = 15 * 60 * 1000; // 15 minutos en milisegundos
-    const INTERVALO = 5000; // 5 segundos
-    let activo = true;
-    let cambios = Math.floor(TIEMPO_LIMITE / INTERVALO); // Número de iteraciones permitidas
-    let i = 1;
-
-    setTimeout(() => { activo = false; }, TIEMPO_LIMITE); // Desactiva tras 15 minutos
-
-    const editar = async () => {
-        if (!activo || i > cambios) return;
-        let decoNuevo = randomGuraDeco(i);
-        let textoNuevo = textoCreador(decoNuevo);
-        try {
-            await conn.sendMessage(m.chat, {
-                edit: sent.key,
-                text: textoNuevo,
-                contextInfo: {
-                    externalAdReply: {
-                        showAdAttribution: true,
-                        title: 'Gawr Gura - Bot ',
-                        body: 'Creador: 💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖 ',
-                        thumbnailUrl: decoNuevo.img,
-                        sourceUrl: 'https://github.com',
-                        mediaType: 1,
-                        renderLargerThumbnail: true
-                    }
-                }
-            });
-        } catch (e) { /* Si no se puede editar, ignora el error */ }
-        i++;
-        if (i <= cambios) setTimeout(editar, INTERVALO);
+        const codigo = generarCodigoAleatorio();
+        await conn.sendMessage(m.chat, { edit: sent.key, text: `🔍 *Extrayendo información...*\n\n\`\`\`${codigo}\`\`\`` });
+        tiempoTranscurrido += INTERVALO;
+        setTimeout(actualizarExtraccion, INTERVALO);
     };
 
-    setTimeout(editar, INTERVALO);
+    const mostrarInformacion = async () => {
+        let deco = DECORACIONES[Math.floor(Math.random() * DECORACIONES.length)];
+        let texto = `${deco.arriba}\n${deco.centro} *👑 Contacto Oficial del Creador 👑*\n${deco.abajo}`;
+        texto += `\n\n${deco.centro} *Nombre:* 💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖`;
+        texto += `\n${deco.centro} *País:* 🇨🇴 Colombia`;
+        texto += `\n${deco.centro} *Rol:* Desarrollador de Gawr Gura Bot`;
+        texto += `\n\n${deco.centro} “¡Gracias por usar este bot!”`;
+        await conn.sendMessage(m.chat, { edit: sent.key, text: texto });
+    };
+
+    actualizarExtraccion();
 };
 
 handler.help = ['owner', 'creator'];
