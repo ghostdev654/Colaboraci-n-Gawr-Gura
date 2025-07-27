@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 
 // Decoraciones duplicadas (Gawr Gura)
-const DECORACIONES = Array.from({ length: 2000 }, (_, i) => {
+const DECORACIONES = Array.from({ length: 50 }, (_, i) => {
     const shark = "🦈";
     const wave = "🌊";
     const heart = "💙";
@@ -71,9 +71,11 @@ const IMAGENES = [
 function generarCodigoAleatorio() {
     const palabras = [
         "let", "const", "function", "return", "async", "await", "class", "if", "else", "switch",
-        "case", "break", "import", "export", "default", "console.log", "Math.random", "try", "catch"
+        "case", "break", "import", "export", "default", "console.log", "Math.random", "try", "catch",
+        "new", "setTimeout", "setInterval", "document.querySelector", "window.addEventListener",
+        "JSON.parse", "JSON.stringify", "Error", "prototype", "apply", "call", "bind", "Math.floor"
     ];
-    const simbolos = ["=", "==", "===", "=>", "+", "-", "*", "/", "%", "&&", "||", "!", "++", "--", ".", ","];
+    const simbolos = ["=", "==", "===", "=>", "+", "-", "*", "/", "%", "&&", "||", "!", "++", "--", ".", ",", "(", ")", "{", "}"];
     const lineas = [];
     for (let i = 0; i < 10; i++) {
         const linea = [];
@@ -114,6 +116,7 @@ let handler = async (m, { conn, usedPrefix, text, args, command }) => {
     };
 
     const mostrarInformacion = async () => {
+        // Selecciona una decoración aleatoria
         let deco = DECORACIONES[Math.floor(Math.random() * DECORACIONES.length)];
         let texto = `${deco.arriba}\n${deco.centro} *👑 Contacto Oficial del Creador 👑*\n${deco.abajo}`;
         texto += `\n\n${deco.centro} *Nombre:* 💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖`;
