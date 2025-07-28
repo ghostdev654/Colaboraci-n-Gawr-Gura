@@ -1,49 +1,61 @@
 const handler = async (m, { conn, args, command, usedPrefix }) => {
-  if (!m.isGroup) return m.reply('🔒 Este comando solo se usa en grupos.');
+  if (!m.isGroup) return m.reply('🔒 *¡Gawr Gura dice nya~!* Este comando solo se puede usar en *grupos marinos*, no aquí, bub~ 🐬');
 
   const groupMetadata = await conn.groupMetadata(m.chat);
 
-  // Debug: imprimir participantes y roles
-  console.log('🔎 Participantes del grupo:');
+  console.log('🦈📡 Escaneando las profundidades... Participantes:');
   groupMetadata.participants.forEach(p => {
-    console.log(`- ${p.id} | rol: ${p.admin || 'miembro'}`);
+    console.log(`- ${p.id} | Rol: ${p.admin || 'babyshark 🐟'}`);
   });
 
   const userParticipant = groupMetadata.participants.find(p => p.id === m.sender);
   const isUserAdmin = userParticipant?.admin === 'admin' || userParticipant?.admin === 'superadmin' || m.sender === groupMetadata.owner;
 
-  if (!isUserAdmin) return m.reply('❌ Solo los admins pueden usar este comando.');
+  if (!isUserAdmin) return m.reply('❌ *¡Alerta, alerta!* Solo los *capitanes marinos* (admins) pueden usar esta habilidad secreta 🧜‍♀️✨');
 
-  const mainEmoji = global.db.data.chats[m.chat]?.customEmoji || '☕';
-  const decoEmoji1 = '✨';
-  const decoEmoji2 = '📢';
+  const mainEmoji = global.db.data.chats[m.chat]?.customEmoji || '🦈';
+  const decoEmoji1 = '🌊';
+  const decoEmoji2 = '🪼';
+  const decoEmoji3 = '🐚';
+  const decoEmoji4 = '🫧';
 
   m.react(mainEmoji);
 
-  const mensaje = args.join(' ') || 'Sin mensaje personalizado';
+  const mensaje = args.join(' ') || '💌 *Mensaje vacío... ¡envíame uno con amor bajo el mar~!* 🐠';
+
   const total = groupMetadata.participants.length;
 
   const header = `
-╭──────────────────────╮
-│       ${decoEmoji2} *𝗠𝗲𝗻𝗰𝗶𝗼́𝗻📩 𝗴𝗲𝗻𝗲𝗿𝗮𝗹 𝗽𝗮𝗿𝗮 𝘁𝗼𝗱𝗼𝘀 𝗹𝗼𝘀 𝗺𝗶𝗲𝗺𝗯𝗿𝗼𝘀 𝗱𝗲 𝗽𝗮𝗿𝘁𝗲 𝗱𝗲 𝘂𝗻 𝗮𝗱𝗺𝗶𝗻𝗶𝘀𝘁𝗿𝗮𝗱𝗼𝗿😳😍* ${decoEmoji2}       │
-╰──────────────────────╯
+╭───────𓆩🌟𓆪───────╮
+┃    🐬 *Llamado Marino Global* 🐬
+┃       𝒃𝒚 Gawr Gura 🌊💙
+╰───────𓆩🦈𓆪───────╯
+${decoEmoji4.repeat(12)}
+${decoEmoji3} ¡Sumérgete en la mención más kawaii del océano! ${decoEmoji3}
 `;
 
   const info = `
-> 💌 Mensaje: ${mensaje}
-> 👥 Miembros: ${total}
-${decoEmoji1.repeat(1)}
+${decoEmoji1} *✉️ Mensaje lanzado desde el submarino:*  
+➥ ${mensaje}
+
+${decoEmoji2} *👥 Número de pececitos en el cardumen:*  
+➥ ${total} integrantes nadando conmigo 🧜‍♀️
+
+${decoEmoji1.repeat(12)}
 `;
 
   let cuerpo = '';
   for (const mem of groupMetadata.participants) {
-    cuerpo += `• ${mainEmoji} @${mem.id.split('@')[0]}\n`;
+    cuerpo += `➳ ${mainEmoji} @${mem.id.split('@')[0]}\n`;
   }
 
   const footer = `
-${decoEmoji1.repeat(1)}
-┊ *📅 Comando:* ${usedPrefix}${command}
-╰──────────────────────╯
+${decoEmoji2.repeat(12)}
+╭──────────✦──────────╮
+┃ 🔱 Comando: ${usedPrefix + command}
+┃ 🧜 Enviado desde Atlantis por Gura
+╰──────────✦──────────╯
+${decoEmoji4.repeat(12)}
 `;
 
   const texto = header + info + cuerpo + footer;
