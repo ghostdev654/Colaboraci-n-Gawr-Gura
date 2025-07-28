@@ -27,20 +27,44 @@ let handler = async (m, { conn, args, command }) => {
     return m.reply(`💢 *¡Eh?! Voz "${voiceModel}" no encontrada desu~...*\n🌊 *Voces disponibles:*\n${vocesDisponibles.join(', ')}`)
   }
 
+  // Lista de APIs (principal y de respaldo)
+  const apis = [
+    `https://zenzxz.dpdns.org/tools/text2speech?text=${encodeURIComponent(text)}`, // API principal
+    `https://api.streamelements.com/kappa/v2/speech?voice=${voiceModel}&text=${encodeURIComponent(text)}`, // Respaldo 1
+    `https://freetts.com/Home/PlayAudio?Language=en-US&Voice=${encodeURIComponent(voiceModel)}&Text=${encodeURIComponent(text)}` // Respaldo 2
+  ]
+
+  let audioUrl = null
+
+  for (const apiUrl of apis) {
+    try {
+      const res = await fetch(apiUrl)
+      
+      if (res.ok) {
+        // Determinar formato de respuesta según API
+        if (apiUrl.includes('zenzxz')) {
+          const json = await res.json()
+          audioUrl = json.audio_url
+        } else if (apiUrl.includes('streamelements')) {
+          const json = await res.json()
+          audioUrl = json.audio_url
+        } else if (apiUrl.includes('freetts')) {
+          audioUrl = apiUrl // FreeTTS devuelve el audio directamente
+        }
+
+        if (audioUrl) break // Salir del bucle si se obtiene audio
+      }
+    } catch (e) {
+      console.error(`Error con la API: ${apiUrl}`, e)
+    }
+  }
+
+  if (!audioUrl) {
+    return m.reply('💦 *Awww~ Todas las APIs fallaron desu~... ¡Inténtalo más tarde, buba!*')
+  }
+
   try {
-    const res = await fetch(`https://zenzxz.dpdns.org/tools/text2speech?text=${encodeURIComponent(text)}`)
-    const json = await res.json()
-
-    if (!json.status || !Array.isArray(json.results)) {
-      return m.reply('💦 *Awww~ Hubo un error al obtener los datos de la API... inténtalo otra vez, buba!*')
-    }
-
-    const voice = json.results.find(v => v.model === voiceModel)
-    if (!voice || !voice.audio_url) {
-      return m.reply('💔 *Hyaaa~ No pude generar el audio con esa voz desu~... ¡Prueba con otra buba!*')
-    }
-
-    const audioRes = await fetch(voice.audio_url)
+    const audioRes = await fetch(audioUrl)
     const audioBuffer = await audioRes.arrayBuffer()
 
     await conn.sendMessage(m.chat, {
@@ -51,7 +75,7 @@ let handler = async (m, { conn, args, command }) => {
 
   } catch (e) {
     console.error(e)
-    m.reply('💢 *¡Gyaa~! Algo salió mal al generar el audio desu~... inténtalo otra vez, uwu!*')
+    m.reply('💢 *¡Gyaa~! Algo salió mal al enviar el audio desu~... inténtalo otra vez, uwu!*')
   }
 }
 
