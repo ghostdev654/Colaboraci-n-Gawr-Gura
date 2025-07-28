@@ -6,35 +6,35 @@ const handler = async (m, { conn }) => {
     if (!match) return;
 
     const url = match[0];
-    const emoji = '📘';
-    const emoji2 = '⚠️';
-    const rwait = '⏳';
-    const done = '✅';
-    const error = '❌';
-    const msm = '❗';
+    const sharkEmoji = '🦈';
+    const warningEmoji = '⚠️';
+    const waitingEmoji = '🌊';
+    const successEmoji = '✨';
+    const errorEmoji = '❌';
+    const oopsEmoji = '💢';
 
     let res;
     try {
-        await m.react(rwait);
+        await m.react(waitingEmoji); // Gura-style waiting emoji
         res = await igdl(url);
     } catch (e) {
-        return conn.reply(m.chat, `${msm} Error al obtener datos. Verifica el enlace.`, m);
+        return conn.reply(m.chat, `${oopsEmoji} *Aww, algo salió mal desu~... ¡Revisa el enlace, buba!*`, m);
     }
 
     let result = res.data;
     if (!result || result.length === 0) {
-        return conn.reply(m.chat, `${emoji2} No se encontraron resultados.`, m);
+        return conn.reply(m.chat, `${warningEmoji} *Nada de nada ~ no encontré nada que descargar... buba! 🦈💦*`, m);
     }
 
     let data;
     try {
         data = result.find(i => i.resolution === "720p (HD)") || result.find(i => i.resolution === "360p (SD)");
     } catch (e) {
-        return conn.reply(m.chat, `${msm} Error al procesar los datos.`, m);
+        return conn.reply(m.chat, `${oopsEmoji} *Oopsie doopsie! Tuve problemas procesando los datos desu... 🦈💔*`, m);
     }
 
     if (!data) {
-        return conn.reply(m.chat, `${emoji2} No se encontró una resolución adecuada.`, m);
+        return conn.reply(m.chat, `${warningEmoji} *Eh?? No encontré una resolución buena, uwu~ 💦*`, m);
     }
 
     let video = data.url;
@@ -43,16 +43,16 @@ const handler = async (m, { conn }) => {
             m.chat,
             {
                 video: { url: video },
-                caption: `${emoji} *Aquí tienes vv.*`,
+                caption: `${sharkEmoji} *¡Aquí tienes, buba! Espero que te guste desu~ 🦈✨*`,
                 fileName: 'fb.mp4',
                 mimetype: 'video/mp4'
             },
             { quoted: m }
         );
-        await m.react(done);
+        await m.react(successEmoji); // Gura-style success emoji
     } catch (e) {
-        await m.react(error);
-        return conn.reply(m.chat, `${msm} Error al enviar el video.`, m);
+        await m.react(errorEmoji);
+        return conn.reply(m.chat, `${oopsEmoji} *¡Hyaaa! Algo falló al enviarte el video... ¡No te enojes conmigo desu~! 🦈💦*`, m);
     }
 };
 
