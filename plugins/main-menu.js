@@ -2,6 +2,24 @@ import fs from 'fs'
 import { join } from 'path'
 import { xpRange } from '../lib/levelling.js'
 
+// Decoraciones dinámicas para bordes
+const decorations = [
+  '✧･ﾟ: *✧･ﾟ: 🦈* :･ﾟ✧ :･ﾟ✧',
+  '✿･ﾟ: *✿･ﾟ: 🌊* :･ﾟ✿ :･ﾟ✿',
+  '☁︎･ﾟ: *☁︎･ﾟ: 🐟* :･ﾟ☁︎ :･ﾟ☁︎',
+  '✦･ﾟ: *✦･ﾟ: 🐚* :･ﾟ✦ :･ﾟ✦',
+  '✸･ﾟ: *✸･ﾟ: 💙* :･ﾟ✸ :･ﾟ✸',
+]
+
+// Decoraciones dinámicas para textos internos
+const textStyles = [
+  { greeting: 'ʜᴇʏ~ 🦈', activity: '✨ Actitud increíble', dateText: '🌊 Fecha hoy' },
+  { greeting: 'ʜʏᴇᴇ~ 🌊', activity: '🌟 Potencia activa', dateText: '🐚 Día actual' },
+  { greeting: 'ʜᴏʟᴀ~ 🐟', activity: '🐬 Gran energía', dateText: '💙 Momento presente' },
+  { greeting: 'ʙᴜʙᴀ~ 💙', activity: '☁️ Brilla fuerte', dateText: '✨ Fecha exacta' },
+  { greeting: 'ᴛʜᴇᴘᴏᴡᴇʀ~ 🌟', activity: '🌊 Fluidez total', dateText: '🦈 Tiempo actual' },
+]
+
 const tags = {
   serbot: '✦ Subs Bot',
   downloader: '✦ Downloaders',
@@ -14,23 +32,14 @@ const tags = {
   ia: '✦ Inteligencia Artificial',
 }
 
-// Decoraciones dinámicas para la animación
-const decorations = [
-  '✧･ﾟ: *✧･ﾟ: 🦈* :･ﾟ✧ :･ﾟ✧',
-  '✿･ﾟ: *✿･ﾟ: 🌊* :･ﾟ✿ :･ﾟ✿',
-  '☁︎･ﾟ: *☁︎･ﾟ: 🐟* :･ﾟ☁︎ :･ﾟ☁︎',
-  '✦･ﾟ: *✦･ﾟ: 🐚* :･ﾟ✦ :･ﾟ✦',
-  '✸･ﾟ: *✸･ﾟ: 💙* :･ﾟ✸ :･ﾟ✸',
-]
-
 const defaultMenu = {
   before: `
-> ✎ Hola, soy %botname
+> %greeting
 ( *%tipo* )
 
 > ⤿ ¿Qué tal %name? ˎˊ˗
-✿ Actividad: %uptime ⌇
-✧ Fecha: %date
+%activity: %uptime ⌇
+%dateText: %date
 
 ➤ ✐ Puedes personalizar el nombre de tu socket con:
 > ✎ ⤿ .setname
@@ -92,6 +101,7 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
     let sentMessageID = null
     while (Date.now() - startTime < 5000) {
       const randomDecoration = decorations[Math.floor(Math.random() * decorations.length)]
+      const randomTextStyle = textStyles[Math.floor(Math.random() * textStyles.length)]
 
       const _text = [
         menuConfig.before,
@@ -131,7 +141,9 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
         uptime: clockString(process.uptime() * 1000),
         tipo,
         readmore: readMore,
-        greeting,
+        greeting: randomTextStyle.greeting,
+        activity: randomTextStyle.activity,
+        dateText: randomTextStyle.dateText,
       }
 
       const text = _text.replace(
@@ -179,18 +191,3 @@ function clockString(ms) {
   let s = isNaN(ms) ? '--' : Math.floor(ms / 1000) % 60
   return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':')
 }
-
-const ase = new Date()
-let hour = ase.getHours()
-
-const greetingMap = {
-  0: 'una linda noche 🌙', 1: 'una linda noche 💤', 2: 'una linda noche 🦉',
-  3: 'una linda mañana ✨', 4: 'una linda mañana 💫', 5: 'una linda mañana 🌅',
-  6: 'una linda mañana 🌄', 7: 'una linda mañana 🌅', 8: 'una linda mañana 💫',
-  9: 'una linda mañana ✨', 10: 'un lindo día 🌞', 11: 'un lindo día 🌨',
-  12: 'un lindo día ❄', 13: 'un lindo día 🌤', 14: 'una linda tarde 🌇',
-  15: 'una linda tarde 🥀', 16: 'una linda tarde 🌹', 17: 'una linda tarde 🌆',
-  18: 'una linda noche 🌙', 19: 'una linda noche 🌃', 20: 'una linda noche 🌌',
-  21: 'una linda noche 🌃', 22: 'una linda noche 🌙', 23: 'una linda noche 🌃',
-}
-var greeting = 'espero que tengas ' + (greetingMap[hour] || 'un buen día')
