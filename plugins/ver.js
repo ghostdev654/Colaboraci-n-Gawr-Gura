@@ -1,41 +1,34 @@
-import fs from 'fs';
-import path from 'path';
-
 const handler = async (m, { conn }) => {
-  if (!m.quoted) return m.reply('🔁 *Responde a una imagen o video enviada para ver una vez.*');
+  if (!m.quoted) throw '🔁 *Responde a un mensaje de imagen o video de "ver una vez".*';
 
-  const q = m.quoted;
-  const msg = q.msg || {};
+  let q = m.quoted;
+  let msg = q.msg || q;
+  let viewOnce = msg?.viewOnceMessage || msg?.viewOnceMessageV2;
 
-  // Detectar si es tipo 'ver una vez'
-  const isViewOnce = !!msg?.viewOnceMessage || !!msg?.viewOnceMessageV2;
-  if (!isViewOnce) return m.reply('⚠️ *Ese mensaje no es de tipo "ver una vez".*');
+  if (!viewOnce) throw '⚠️ *Ese mensaje no es de tipo "ver una vez".*';
+
+  let mediaMsg = viewOnce.message?.imageMessage || viewOnce.message?.videoMessage;
+  if (!mediaMsg) throw '❌ *El mensaje no contiene imagen ni video.*';
 
   try {
-    // Obtener el contenido real del mensaje
-    const realMsg = msg?.viewOnceMessage?.message || msg?.viewOnceMessageV2?.message;
-    if (!realMsg) return m.reply('❌ *No se pudo acceder al contenido.*');
+    let type = mediaMsg.mimetype.includes('image') ? 'image' : 'video';
+    let buffer = await conn.downloadMediaMessage({
+      key: q.key,
+      message: {
+        [`${type}Message`]: {
+          ...mediaMsg,
+          viewOnce: false, // Forzar que se descargue como normal
+        },
+      },
+    });
 
-    const mediaType = Object.keys(realMsg)[0]; // ej. 'imageMessage' o 'videoMessage'
-    const media = realMsg[mediaType];
-    const mimetype = media?.mimetype || '';
-    const buffer = await conn.download(q);
+    if (!buffer) throw '⛔ *No se pudo descargar el archivo.*';
 
-    if (!buffer) return m.reply('❌ *No se pudo descargar el archivo.*');
-
-    const ext = mimetype.includes('image') ? '.jpg' :
-                mimetype.includes('video') ? '.mp4' : '';
-    if (!ext) return m.reply('🚫 *Solo se admiten imágenes o videos.*');
-
-    const filename = `viewonce-${Date.now()}${ext}`;
-    const filePath = path.join('./temp', filename);
-    fs.writeFileSync(filePath, buffer);
-
-    await conn.sendFile(m.chat, filePath, filename, `📤 *Aquí tienes el archivo normal, sin ver una vez* 👀`, m);
-    fs.unlinkSync(filePath); // Eliminar temporal
+    let ext = type === 'image' ? '.jpg' : '.mp4';
+    await conn.sendFile(m.chat, buffer, `veruna${ext}`, `📤 *Aquí tienes tu archivo como normal!*`, m);
   } catch (err) {
     console.error(err);
-    return m.reply('😿 *Ocurrió un error al procesar el mensaje.*');
+    throw '😿 *Error al intentar procesar el mensaje.*';
   }
 };
 
