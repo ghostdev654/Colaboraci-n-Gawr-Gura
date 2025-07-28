@@ -12,8 +12,16 @@ let handler = async (m, { conn, usedPrefix, command, text }) => {
 
     let result = search.data[0]
 
-    // 🧾 Mostrar info del video
-    let info = `✨ *「𝘼𝙦𝙪𝙞́ 𝙩𝙚𝙣𝙚𝙢𝙤𝙨 𝙗𝙪𝙗𝙖!」*\n\n` +
+    // 🧾 Mostrar info del video con decoración aleatoria
+    const decorations = [
+      `✨ *「𝘼𝙦𝙪𝙞́ 𝙩𝙚𝙣𝙚𝙢𝙤𝙨 𝙗𝙪𝙗𝙖!」*\n\n`,
+      `🌊 *「¡Hiii~ Esto es lo que encontré desu~!」*\n\n`,
+      `🌟 *「Mira buba~ ¡Aquí está!」*\n\n`,
+      `🦈 *「¡Tiburón trabajando, aquí está tu resultado!」*\n\n`,
+      `💙 *「¡Esto es para ti, buba~!」*\n\n`
+    ]
+    const randomDecoration = decorations[Math.floor(Math.random() * decorations.length)]
+    let info = `${randomDecoration}` +
                `🦈 *Título:* ${result.title}\n` +
                `🌊 *Canal:* ${result.author?.name || 'Desconocido'}\n` +
                `⏳ *Duración:* ${result.duration || 'Desconocida'}\n` +
@@ -27,16 +35,39 @@ let handler = async (m, { conn, usedPrefix, command, text }) => {
       await m.reply(info)
     }
 
-    // 🎧 Descargar audio usando la API de Adonix
-    let r = await fetch(`https://theadonix-api.vercel.app/api/ytmp3?url=${encodeURIComponent(result.url)}`)
-    let json = await r.json()
+    // 🎧 Descargar audio desde múltiples APIs
+    const apis = [
+      `https://theadonix-api.vercel.app/api/ytmp3?url=${encodeURIComponent(result.url)}`, // API 1
+      `https://yt1s.com/api/ajaxSearch/index?vid=${encodeURIComponent(result.url)}`, // API 2
+      `https://api.vevioz.com/api/button/mp3/${encodeURIComponent(result.url)}`, // API 3
+      `https://api.ytjar.download/audio?url=${encodeURIComponent(result.url)}` // API 4
+    ]
 
-    if (!json?.result?.audio) {
-      return m.reply('❌ *Hyaaa~ No pude conseguir el audio buba~.*')
+    let audioUrl = null
+    for (const api of apis) {
+      try {
+        const res = await fetch(api)
+        const json = await res.json()
+
+        // Verificar si la API devuelve un enlace de audio
+        if (json?.result?.audio) {
+          audioUrl = json.result.audio
+          break
+        } else if (json?.links?.mp3) {
+          audioUrl = json.links.mp3
+          break
+        } else if (json?.url) {
+          audioUrl = json.url
+          break
+        }
+      } catch (e) {
+        console.error(`Error con la API: ${api}`, e)
+      }
     }
 
-    let audioUrl = json.result.audio
-    let filename = json.result.filename || 'audio.mp3'
+    if (!audioUrl) {
+      return m.reply('❌ *Hyaaa~ No pude conseguir el audio buba~.*')
+    }
 
     // 🗣️ Descargar el buffer
     let audioRes = await fetch(audioUrl)
@@ -48,7 +79,7 @@ let handler = async (m, { conn, usedPrefix, command, text }) => {
     await conn.sendMessage(m.chat, {
       audio: audioBuffer,
       mimetype: 'audio/mpeg',
-      fileName: filename,
+      fileName: 'audio.mp3',
       ptt: true
     }, { quoted: m })
 
