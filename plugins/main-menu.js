@@ -14,6 +14,15 @@ const tags = {
   ia: '✦ Inteligencia Artificial',
 }
 
+// Decoraciones dinámicas para la animación
+const decorations = [
+  '✧･ﾟ: *✧･ﾟ: 🦈* :･ﾟ✧ :･ﾟ✧',
+  '✿･ﾟ: *✿･ﾟ: 🌊* :･ﾟ✿ :･ﾟ✿',
+  '☁︎･ﾟ: *☁︎･ﾟ: 🐟* :･ﾟ☁︎ :･ﾟ☁︎',
+  '✦･ﾟ: *✦･ﾟ: 🐚* :･ﾟ✦ :･ﾟ✦',
+  '✸･ﾟ: *✸･ﾟ: 💙* :･ﾟ✸ :･ﾟ✸',
+]
+
 const defaultMenu = {
   before: `
 > ✎ Hola, soy %botname
@@ -28,14 +37,12 @@ const defaultMenu = {
 > *✐ Y cambiar el banner con:*
 > ✎ ⤿ .setbanner
 
-> ⌦ ✧ Mᴇɴᴜ ᴅᴇ ᴄᴏᴍᴀɴᴅᴏꜱ ➤
-
 %readmore`.trimStart(),
 
-  header: '\n> *✿ ❝ %category ❞*',
+  header: '\n> *%decoration*\n> *❝ %category ❞*',
   body: '\n> ☄︎ %cmd %islimit %isPremium',
   footer: '',
-  after: '\n> ⋆power by Harold',
+  after: '\n> ⋆creado por yo soy yo',
 }
 
 const handler = async (m, { conn, usedPrefix: _p }) => {
@@ -80,62 +87,79 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
 
     const menuConfig = conn.menu || defaultMenu
 
-    const _text = [
-      menuConfig.before,
-      ...Object.keys(tags).map(tag => {
-        return [
-          menuConfig.header.replace(/%category/g, tags[tag]),
-          help.filter(menu => menu.tags?.includes(tag)).map(menu =>
-            menu.help.map(helpText =>
-              menuConfig.body
-                .replace(/%cmd/g, menu.prefix ? helpText : `${_p}${helpText}`)
-                .replace(/%islimit/g, menu.limit ? '◜⭐◞' : '')
-                .replace(/%isPremium/g, menu.premium ? '◜🪪◞' : '')
-                .trim()
-            ).join('\n')
-          ).join('\n'),
-          menuConfig.footer,
-        ].join('\n')
-      }),
-      menuConfig.after
-    ].join('\n')
+    // Duración de la animación (5 segundos)
+    const startTime = Date.now()
+    let sentMessageID = null
+    while (Date.now() - startTime < 5000) {
+      const randomDecoration = decorations[Math.floor(Math.random() * decorations.length)]
 
-    const replace = {
-      '%': '%',
-      p: _p,
-      botname: nombreBot,
-      taguser: '@' + m.sender.split('@')[0],
-      exp: exp - min,
-      maxexp: xp,
-      totalexp: exp,
-      xp4levelup: max - exp,
-      level,
-      limit,
-      name,
-      date,
-      uptime: clockString(process.uptime() * 1000),
-      tipo,
-      readmore: readMore,
-      greeting,
+      const _text = [
+        menuConfig.before,
+        ...Object.keys(tags).map(tag => {
+          return [
+            menuConfig.header
+              .replace(/%category/g, tags[tag])
+              .replace(/%decoration/g, randomDecoration),
+            help.filter(menu => menu.tags?.includes(tag)).map(menu =>
+              menu.help.map(helpText =>
+                menuConfig.body
+                  .replace(/%cmd/g, menu.prefix ? helpText : `${_p}${helpText}`)
+                  .replace(/%islimit/g, menu.limit ? '◜⭐◞' : '')
+                  .replace(/%isPremium/g, menu.premium ? '◜🪪◞' : '')
+                  .trim()
+              ).join('\n')
+            ).join('\n'),
+            menuConfig.footer,
+          ].join('\n')
+        }),
+        menuConfig.after,
+      ].join('\n')
+
+      const replace = {
+        '%': '%',
+        p: _p,
+        botname: nombreBot,
+        taguser: '@' + m.sender.split('@')[0],
+        exp: exp - min,
+        maxexp: xp,
+        totalexp: exp,
+        xp4levelup: max - exp,
+        level,
+        limit,
+        name,
+        date,
+        uptime: clockString(process.uptime() * 1000),
+        tipo,
+        readmore: readMore,
+        greeting,
+      }
+
+      const text = _text.replace(
+        new RegExp(`%(${Object.keys(replace).sort((a, b) => b.length - a.length).join('|')})`, 'g'),
+        (_, name) => String(replace[name])
+      )
+
+      const isURL = typeof bannerFinal === 'string' && /^https?:\/\//i.test(bannerFinal)
+      const imageContent = isURL
+        ? { image: { url: bannerFinal } }
+        : { image: fs.readFileSync(bannerFinal) }
+
+      if (!sentMessageID) {
+        const response = await conn.sendMessage(m.chat, {
+          ...imageContent,
+          caption: text.trim(),
+          mentionedJid: conn.parseMention(text),
+        }, { quoted: m })
+        sentMessageID = response.key.id
+      } else {
+        await conn.modifyMessage(m.chat, sentMessageID, {
+          ...imageContent,
+          caption: text.trim(),
+        })
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 1000)) // Esperar 1 segundo antes de actualizar
     }
-
-    const text = _text.replace(
-      new RegExp(`%(${Object.keys(replace).sort((a, b) => b.length - a.length).join('|')})`, 'g'),
-      (_, name) => String(replace[name])
-    )
-
-    const isURL = typeof bannerFinal === 'string' && /^https?:\/\//i.test(bannerFinal)
-    const imageContent = isURL
-      ? { image: { url: bannerFinal } }
-      : { image: fs.readFileSync(bannerFinal) }
-
-    await conn.sendMessage(m.chat, {
-      ...imageContent,
-      caption: text.trim(),
-      mentionedJid: conn.parseMention(text),
-      ...rcanal
-    }, { quoted: m })
-
   } catch (e) {
     console.error('❌ Error en el menú:', e)
     conn.reply(m.chat, '❎ Lo sentimos, el menú tiene un error.', m)
