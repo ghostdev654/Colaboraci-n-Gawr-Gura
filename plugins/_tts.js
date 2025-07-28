@@ -17,14 +17,14 @@ let handler = async (m, { conn, args, command }) => {
   ]
 
   if (args.length < 2) {
-    return m.reply(`✐ Uso correcto:\n.${command} <voz> <texto>\n\n❐ Voces disponibles:\n${vocesDisponibles.join(', ')}`)
+    return m.reply(`🦈 *Uso correcto, buba~:*\n.${command} <voz> <texto>\n\n🌊 *Voces disponibles:*\n${vocesDisponibles.join(', ')}`)
   }
 
   const voiceModel = args[0].toLowerCase()
   const text = args.slice(1).join(' ')
 
   if (!vocesDisponibles.includes(voiceModel)) {
-    return m.reply(`✐ Voz "${voiceModel}" no encontrada.\n❐ Voces disponibles:\n${vocesDisponibles.join(', ')}`)
+    return m.reply(`💢 *¡Eh?! Voz "${voiceModel}" no encontrada desu~...*\n🌊 *Voces disponibles:*\n${vocesDisponibles.join(', ')}`)
   }
 
   try {
@@ -32,12 +32,12 @@ let handler = async (m, { conn, args, command }) => {
     const json = await res.json()
 
     if (!json.status || !Array.isArray(json.results)) {
-      return m.reply('✦ Error al obtener datos de la API.')
+      return m.reply('💦 *Awww~ Hubo un error al obtener los datos de la API... inténtalo otra vez, buba!*')
     }
 
     const voice = json.results.find(v => v.model === voiceModel)
     if (!voice || !voice.audio_url) {
-      return m.reply('✿ No se pudo generar el audio con esa voz.')
+      return m.reply('💔 *Hyaaa~ No pude generar el audio con esa voz desu~... ¡Prueba con otra buba!*')
     }
 
     const audioRes = await fetch(voice.audio_url)
@@ -51,7 +51,7 @@ let handler = async (m, { conn, args, command }) => {
 
   } catch (e) {
     console.error(e)
-    m.reply('✐ Ocurrió un error al generar el audio.')
+    m.reply('💢 *¡Gyaa~! Algo salió mal al generar el audio desu~... inténtalo otra vez, uwu!*')
   }
 }
 
