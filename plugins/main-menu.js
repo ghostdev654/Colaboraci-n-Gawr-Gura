@@ -164,17 +164,21 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
         }, { quoted: m })
         sentMessageID = response.key.id
       } else {
-        await conn.modifyMessage(m.chat, sentMessageID, {
-          ...imageContent,
-          caption: text.trim(),
-        })
+        try {
+          await conn.modifyMessage(m.chat, sentMessageID, {
+            ...imageContent,
+            caption: text.trim(),
+          })
+        } catch (e) {
+          console.warn('No se pudo editar el mensaje:', e)
+        }
       }
 
       await new Promise(resolve => setTimeout(resolve, 1000)) // Esperar 1 segundo antes de actualizar
     }
   } catch (e) {
     console.error('❌ Error en el menú:', e)
-    conn.reply(m.chat, '❎ Lo sentimos, el menú tiene un error.', m)
+    conn.reply(m.chat, '❎ Lo sentimos, ocurrió un error inesperado.', m)
   }
 }
 
