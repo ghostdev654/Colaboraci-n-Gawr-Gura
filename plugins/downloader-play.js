@@ -89,5 +89,5 @@ let handler = async (m, { conn, usedPrefix, command, text }) => {
   }
 }
 
-handler.command = ['ytbuscar', 'ytbuscar'] // Puedes personalizar el comando
+handler.command = ['ytbuscar', 'ytsearch'] // Puedes personalizar el comando
 export default handler
