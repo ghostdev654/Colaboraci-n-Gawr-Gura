@@ -5,7 +5,7 @@ let linkRegex1 = /whatsapp\.com\/channel\/[0-9A-Za-z]{20,24}/i
 const defaultImage = 'https://files.catbox.moe/felkw2.jpg'
 const byeImage = 'https://files.catbox.moe/fkm1jz.jpg' // Imagen personalizada para despedidas
 
-// helper para checar si es admin o owner
+// Helper para checar si es admin o owner
 async function isAdminOrOwner(m, conn) {
   try {
     const groupMetadata = await conn.groupMetadata(m.chat)
@@ -16,9 +16,9 @@ async function isAdminOrOwner(m, conn) {
   }
 }
 
-// handler principal
+// Handler principal
 const handler = async (m, { conn, command, args, isAdmin, isOwner }) => {
-  if (!m.isGroup) return m.reply('🔒 Solo funciona en grupos.')
+  if (!m.isGroup) return m.reply('🦈 *¡Este comando es solo para grupos buba~!*')
 
   if (!global.db.data.chats[m.chat]) global.db.data.chats[m.chat] = {}
   const chat = global.db.data.chats[m.chat]
@@ -26,24 +26,24 @@ const handler = async (m, { conn, command, args, isAdmin, isOwner }) => {
   const enable = command === 'on'
 
   if (!['antilink', 'welcome', 'antiarabe'].includes(type)) {
-    return m.reply(`✳️ Usa:\n*.on antilink* / *.off antilink*\n*.on welcome* / *.off welcome*\n*.on antiarabe* / *.off antiarabe*`)
+    return m.reply(`🦈 *¿Eh? Usa el comando buba~:*\n\n*.on antilink* / *.off antilink*\n*.on welcome* / *.off welcome*\n*.on antiarabe* / *.off antiarabe*`)
   }
 
-  if (!(isAdmin || isOwner)) return m.reply('❌ Solo admins pueden activar o desactivar funciones.')
+  if (!(isAdmin || isOwner)) return m.reply('❌ *¡Hyaaa~! Solo los admins pueden activar o desactivar funciones desu~!*')
 
   if (type === 'antilink') {
     chat.antilink = enable
-    return m.reply(`✅ Antilink ${enable ? 'activado' : 'desactivado'}.`)
+    return m.reply(`✨ *Antilink ${enable ? 'activado' : 'desactivado'} buba~!*`)
   }
 
   if (type === 'welcome') {
     chat.welcome = enable
-    return m.reply(`✅ Welcome ${enable ? 'activado' : 'desactivado'}.`)
+    return m.reply(`✨ *Welcome ${enable ? 'activado' : 'desactivado'} desu~!*`)
   }
 
   if (type === 'antiarabe') {
     chat.antiarabe = enable
-    return m.reply(`✅ Antiarabe ${enable ? 'activado' : 'desactivado'}.`)
+    return m.reply(`✨ *Antiárabe ${enable ? 'activado' : 'desactivado'} uwu~!*`)
   }
 }
 
@@ -52,7 +52,7 @@ handler.group = true
 handler.tags = ['group']
 handler.help = ['on welcome', 'off welcome', 'on antilink', 'off antilink']
 
-// lógica antes de cada mensaje
+// Lógica antes de cada mensaje
 handler.before = async (m, { conn }) => {
   if (!m.isGroup) return
   if (!global.db.data.chats[m.chat]) global.db.data.chats[m.chat] = {}
@@ -68,7 +68,7 @@ handler.before = async (m, { conn }) => {
     const isArab = arabicPrefixes.some(prefix => number.startsWith(prefix))
 
     if (isArab) {
-      await conn.sendMessage(m.chat, { text: `Mm ${newJid} será expulsado por número sospechoso (Antiárabe activado).` })
+      await conn.sendMessage(m.chat, { text: `🦈 *Mm buba~... ${newJid} tiene un número sospechoso. ¡Sayonara! (Antiárabe activado).*` })
       await conn.groupParticipantsUpdate(m.chat, [newJid], 'remove')
       return true
     }
@@ -92,7 +92,7 @@ handler.before = async (m, { conn }) => {
 
       try {
         await conn.sendMessage(m.chat, {
-          text: `🚫 Hey ${userTag}, no se permiten links aquí.`,
+          text: `🌊 *Hey buba~ ${userTag}, ¡no se permiten links aquí desu~!*`,
           mentions: [m.sender]
         }, { quoted: m })
 
@@ -108,7 +108,7 @@ handler.before = async (m, { conn }) => {
         await conn.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
       } catch {
         await conn.sendMessage(m.chat, {
-          text: `⚠️ No pude eliminar ni expulsar a ${userTag}. Puede que no tenga permisos.`,
+          text: `⚠️ *¡Hyaaa~! No pude eliminar ni expulsar a ${userTag}. ¿Me falta un permiso, buba~?*`,
           mentions: [m.sender]
         }, { quoted: m })
       }
@@ -131,11 +131,11 @@ handler.before = async (m, { conn }) => {
     }
 
     if (m.messageStubType === 27) {
-      const txtWelcome = '🌸 𝙱𝙸𝙴𝙽𝚅𝙴𝙽𝙸𝙳@ 🌸'
+      const txtWelcome = '🦈 *¡Bienvenid@ buba~!* 🦈'
       const bienvenida = `
-𝙷𝙾𝙻𝙰 ֮ϐׁꪱׁׁׁׅׅׅꫀׁׅܻ݊݊ꪀׁׅ᥎ׁׅꫀׁׅܻ݊݊ꪀꪱׁׁׁׅׅׅժׁׅ݊${userMention}🆒
-Ꭺ ꍟꑄ꓄ꍟ 𝙝𝙚𝙧𝙢𝙤𝙨𝙤 ✨😍 grupo 👥
-𝔢𝔰𝔭𝔢𝔯𝔬 ɖɨֆʄʀʊȶɛֆ tׁׅυׁׅ 𝑒𝑠𝑡𝑎𝑑𝑖́𝑎✌🏽😍
+🌊 *Hiii~ ${userMention} buba~*
+✨ *Este grupo es increíble, espero te diviertas desu~!* 🦈💕
+
 `.trim()
 
       await conn.sendMessage(m.chat, {
@@ -146,13 +146,10 @@ handler.before = async (m, { conn }) => {
     }
 
     if (m.messageStubType === 28 || m.messageStubType === 32) {
-      const txtBye = '🌸 𝙰𝙳𝙸Ó𝚂 🌸'
+      const txtBye = '🌊 *¡Adiós buba~!* 🦈'
       const despedida = `
-ႮႶ 𝐚𝐩𝐚𝐜𝐢𝐨𝐧𝐚𝐝𝐨😻 ρσя ૯Ն ｖｏｌｅｉｂｏｌ🏐
-𝐚𝐜𝐚𝐛𝐚 ძҽ ａｂａｎｄｏｎａｒ👎🏽 este 𝗁𝖾𝗋𝗆𝗈𝗌𝗈 ✨ ᵍʳᵘᵖᵒ😕😍  
-✰ ${userMention}  
-✦ Ahora somos *${groupSize}*  
-> *#help* si necesitas algo.
+💔 *Oh no~ ${userMention} nos está dejando desu~... ¡Qué triste!* 😢
+✨ *Ahora somos ${groupSize} tiburones buba~.* 🦈🌊
 `.trim()
 
       await conn.sendMessage(m.chat, {
