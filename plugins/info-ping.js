@@ -1,6 +1,16 @@
 import fs from 'fs'
 import path from 'path'
 
+// Lista de bordes aleatorios con pares de bordes superior e inferior
+const borders = [
+  { top: '╭───────────────🌊🦈🌊───────────────╮', bottom: '╰───────────────🌊🦈🌊───────────────╯' },
+  { top: '╭═══════════════🐟✨🐟═══════════════╮', bottom: '╰═══════════════🐟✨🐟═══════════════╯' },
+  { top: '╔═══════════════💙🦈💙═══════════════╗', bottom: '╚═══════════════💙🦈💙═══════════════╝' },
+  { top: '╔────────────────🐬🌊🐬────────────────╗', bottom: '╚────────────────🐬🌊🐬────────────────╝' },
+  { top: '╭✧･ﾟ: *✧･ﾟ: 🦈* :･ﾟ✧ :･ﾟ✧╮', bottom: '╰✧･ﾟ: *✧･ﾟ: 🦈* :･ﾟ✧ :･ﾟ✧╯' },
+  { top: '╭━━━━━ 🌟 🦈 🌟 ━━━━━╮', bottom: '╰━━━━━ 🌟 🦈 🌟 ━━━━━╯' },
+]
+
 const handler = async (m, { conn }) => {
   const start = Date.now()
 
@@ -8,7 +18,7 @@ const handler = async (m, { conn }) => {
   const botActual = conn.user?.jid?.split('@')[0].replace(/\D/g, '')
   const configPath = path.join('./JadiBots', botActual, 'config.json')
 
-  let nombreBot = global.namebot || '𝙎𝙃𝙊𝙔𝙊 𝙃𝙄𝙉𝘼𝙏𝘼 ოძ  𝘽 ꂦ Ꮏ'
+  let nombreBot = global.namebot || '🌊🦈 𝙂𝘼𝙒𝙍 𝙂𝙐𝙍𝘼 🦈🌊'
 
   if (fs.existsSync(configPath)) {
     try {
@@ -21,8 +31,21 @@ const handler = async (m, { conn }) => {
 
   const latency = Date.now() - start
 
+  // Seleccionar un par de bordes aleatorio
+  const randomBorder = borders[Math.floor(Math.random() * borders.length)]
+
+  // Crear el mensaje decorado
+  const decoratedMessage = `
+${randomBorder.top}
+│                                    │
+│   🌟 *Ping:* ${latency} ms                 │
+│   🌊 *Bot:* ${nombreBot} está aquí ~ 🦈     │
+│                                    │
+${randomBorder.bottom}
+`
+
   await conn.sendMessage(m.chat, { 
-    text: `☁︎ *Ping:* ${latency} ms\n> ${nombreBot}` 
+    text: decoratedMessage 
   }, { quoted: m })
 }
 
