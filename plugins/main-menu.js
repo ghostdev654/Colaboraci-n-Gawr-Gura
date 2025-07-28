@@ -96,10 +96,9 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
 
     const menuConfig = conn.menu || defaultMenu
 
-    // Duración de la animación (5 segundos)
-    const startTime = Date.now()
+    // Animación indefinida
     let sentMessageID = null
-    while (Date.now() - startTime < 5000) {
+    while (true) {
       const randomDecoration = decorations[Math.floor(Math.random() * decorations.length)]
       const randomTextStyle = textStyles[Math.floor(Math.random() * textStyles.length)]
 
@@ -171,6 +170,7 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
           })
         } catch (e) {
           console.warn('No se pudo editar el mensaje:', e)
+          break // Salir del bucle si no se puede editar más
         }
       }
 
