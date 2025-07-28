@@ -96,6 +96,6 @@ const handler = async (m, { conn, args, command, isAdmin }) => {
 handler.help = ['startauto', 'stopauto']
 handler.tags = ['tools']
 handler.command = ['startauto', 'stopauto'] // Comandos asociados
-handler.group = true // Solo se puede usar en grupos
+handler.group = false // Solo se puede usar en grupos
 
 export default handler
