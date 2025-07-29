@@ -1,53 +1,48 @@
 import moment from 'moment-timezone';
 
-const handler = async (m, {conn}) => {
-  const fechaper = moment().tz('America/Lima').format('DD/MM HH:mm');
-  const fechamex = moment().tz('America/Mexico_City').format('DD/MM HH:mm');
-  const fechabol = moment().tz('America/La_Paz').format('DD/MM HH:mm');
-  const fechachi = moment().tz('America/Santiago').format('DD/MM HH:mm');
-  const fechaarg = moment().tz('America/Argentina/Buenos_Aires').format('DD/MM HH:mm');
-  const fechacol = moment().tz('America/Bogota').format('DD/MM HH:mm');
-  const fechaecu = moment().tz('America/Guayaquil').format('DD/MM HH:mm');
-  const fechacosr = moment().tz('America/Costa_Rica').format('DD/MM HH:mm');
-  const fechacub = moment().tz('America/Havana').format('DD/MM HH:mm');
-  const fechagua = moment().tz('America/Guatemala').format('DD/MM HH:mm');
-  const fechahon = moment().tz('America/Tegucigalpa').format('DD/MM HH:mm');
-  const fechanic = moment().tz('America/Managua').format('DD/MM HH:mm');
-  const fechapan = moment().tz('America/Panama').format('DD/MM HH:mm');
-  const fechauru = moment().tz('America/Montevideo').format('DD/MM HH:mm');
-  const fechaven = moment().tz('America/Caracas').format('DD/MM HH:mm');
-  const fechapar = moment().tz('America/Asuncion').format('DD/MM HH:mm');
-  const fechanew = moment().tz('America/New_York').format('DD/MM HH:mm');
-  const fechaasi = moment().tz('Asia/Jakarta').format('DD/MM HH:mm');
-  const fechabra = moment().tz('America/Sao_Paulo').format('DD/MM HH:mm');
-  const fechaafri = moment().tz('Africa/Malabo').format('DD/MM HH:mm');
-  await conn.sendMessage(m.chat, {text: `「 ZONA-HORARIA ⏰ 」
-⏱️Peru       : ${fechaper}
-⏱️Mexico     : ${fechamex}
-⏱️Bolivia    : ${fechabol}
-⏱️Chile      : ${fechachi}
-⏱️Argentina  : ${fechaarg}
-⏱️Colombia   : ${fechacol}
-⏱️Ecuador    : ${fechaecu}
-⏱️Costa_Rica : ${fechacosr}
-⏱️Cuba       : ${fechacub}
-⏱️Guatemala  : ${fechagua}
-⏱️Honduras   : ${fechahon}
-⏱️Nicaragua  : ${fechanic}
-⏱️Panama     : ${fechapan}
-⏱️Uruguay    : ${fechauru}
-⏱️Venezuela  : ${fechaven}
-⏱️Paraguay   : ${fechapar}
-⏱️New York   : ${fechanew}
-⏱️Asia       : ${fechaasi}
-⏱️Brasil     : ${fechabra}
-⏱️G.N.Q      : ${fechaafri}
-${String.fromCharCode(8206).repeat(850)}
-Zona horaria del servidor actual:\n[ ${Intl.DateTimeFormat().resolvedOptions().timeZone} ] ${moment().tz(Intl.DateTimeFormat().resolvedOptions().timeZone).format('DD/MM/YY HH:mm:ss')}`}, {quoted: m});
+const handler = async (m, { conn }) => {
+  const zonas = [
+    { nombre: 'Perú 🇵🇪', zona: 'America/Lima' },
+    { nombre: 'México 🇲🇽', zona: 'America/Mexico_City' },
+    { nombre: 'Bolivia 🇧🇴', zona: 'America/La_Paz' },
+    { nombre: 'Chile 🇨🇱', zona: 'America/Santiago' },
+    { nombre: 'Argentina 🇦🇷', zona: 'America/Argentina/Buenos_Aires' },
+    { nombre: 'Colombia 🇨🇴', zona: 'America/Bogota' },
+    { nombre: 'Ecuador 🇪🇨', zona: 'America/Guayaquil' },
+    { nombre: 'Costa Rica 🇨🇷', zona: 'America/Costa_Rica' },
+    { nombre: 'Cuba 🇨🇺', zona: 'America/Havana' },
+    { nombre: 'Guatemala 🇬🇹', zona: 'America/Guatemala' },
+    { nombre: 'Honduras 🇭🇳', zona: 'America/Tegucigalpa' },
+    { nombre: 'Nicaragua 🇳🇮', zona: 'America/Managua' },
+    { nombre: 'Panamá 🇵🇦', zona: 'America/Panama' },
+    { nombre: 'Uruguay 🇺🇾', zona: 'America/Montevideo' },
+    { nombre: 'Venezuela 🇻🇪', zona: 'America/Caracas' },
+    { nombre: 'Paraguay 🇵🇾', zona: 'America/Asuncion' },
+    { nombre: 'New York 🇺🇸', zona: 'America/New_York' },
+    { nombre: 'Asia (Jakarta) 🌏', zona: 'Asia/Jakarta' },
+    { nombre: 'Brasil 🇧🇷', zona: 'America/Sao_Paulo' },
+    { nombre: 'Guinea Ecuatorial 🌍', zona: 'Africa/Malabo' },
+  ];
+
+  const zonaActual = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const fechaActual = moment().tz(zonaActual).format('DD/MM/YY HH:mm:ss');
+
+  let mensaje = `╭━━━ ⏰ *ZONAS HORARIAS* ⏰ ━━━╮\n`;
+  mensaje += `┃ *By GuraBot* 🦈\n┃\n`;
+
+  for (const zona of zonas) {
+    const hora = moment().tz(zona.zona).format('DD/MM HH:mm');
+    mensaje += `┃ 🕒 ${zona.nombre.padEnd(16)}: ${hora}\n`;
+  }
+
+  mensaje += `┃\n┣ 🎌 *Zona horaria del servidor actual:*\n┃ 📍 ${zonaActual}\n┃ 📅 ${fechaActual}\n`;
+  mensaje += `╰━━━━━━━━━━━━━━━━━━━━━━━╯`;
+
+  await conn.sendMessage(m.chat, { text: mensaje }, { quoted: m });
 };
 
 handler.help = ['horario'];
 handler.tags = ['info'];
-handler.command = ['horario']
+handler.command = ['horario'];
 
 export default handler;
