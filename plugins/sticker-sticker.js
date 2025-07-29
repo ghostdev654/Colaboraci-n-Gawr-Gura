@@ -5,42 +5,35 @@ import fluent from 'fluent-ffmpeg'
 import { fileTypeFromBuffer as fromBuffer } from 'file-type'
 import { addExif } from '../lib/sticker.js'
 
-const packname = global.packname || 'GuraBot 💙'
-const author = global.author || 'By Gawr Gura'
-
 let handler = async (m, { conn, args }) => {
   let q = m.quoted ? m.quoted : m
   let mime = (q.msg || q).mimetype || q.mediaType || ''
   let buffer
 
   try {
-    if (/image|video|webp|tgs|webm/.test(mime) && q.download) {
-      if (/video|webm/.test(mime) && ((q.msg || q).seconds || 0) > 11) {
-        return m.reply('🌊 Uwaah~ Este video es muy largo.\n✨ Usa uno de *máximo 10 segundos*, nyan~')
+    if (/image|video|webp|tgs|webm/g.test(mime) && q.download) {
+      if (/video|webm/.test(mime) && (q.msg || q).seconds > 11) {
+        return conn.reply(m.chat, '✦❀ Oops... Este sticker animado no puede durar más de *10* segundos ✿', m, rcanal)
       }
       buffer = await q.download()
     } else if (args[0] && isUrl(args[0])) {
       const res = await fetch(args[0])
       buffer = await res.buffer()
     } else {
-      return m.reply('🫧 Hiii~ Responde a una *imagen, sticker, video, webm o tgs* para convertirlo en un sticker bonito~')
+      return conn.reply(m.chat, '✧ Responde con una *Imagen, Sticker, Video, Webm o Tgs* para convertirlo en sticker. ✿', m, rcanal)
     }
 
-    if (!buffer) throw '❌ No se pudo obtener el archivo.'
-
-    await m.react('🕐') // cargando...
+    await m.react('🕓')
 
     const stickerData = await toWebp(buffer)
     const finalSticker = await addExif(stickerData, packname, author)
 
-    if (!finalSticker) throw 'No se pudo generar el sticker :('
-
-    await conn.sendFile(m.chat, finalSticker, 'sticker.webp', '✨ Aquí está tu sticker, desu~!', m)
+    await conn.sendFile(m.chat, finalSticker, 'sticker.webp', '☁︎ Aquí tienes tu sticker ✦', m)
     await m.react('✅')
+
   } catch (e) {
-    await m.react('❌')
-    console.error('🚨 Error al generar el sticker:', e)
-    await m.reply('💔 Uuh~ Gura no pudo crear tu sticker...\nIntenta con otro archivo o revisa que sea compatible.')
+    await m.react('✖️')
+    console.error('❀ Error al crear sticker:', e)
   }
 }
 
@@ -52,9 +45,7 @@ export default handler
 
 async function toWebp(buffer, opts = {}) {
   const { ext } = await fromBuffer(buffer)
-  if (!/(png|jpg|jpeg|mp4|mkv|m4p|gif|webp|webm|tgs)/i.test(ext)) {
-    throw '🌊 Archivo no compatible.'
-  }
+  if (!/(png|jpg|jpeg|mp4|mkv|m4p|gif|webp|webm|tgs)/i.test(ext)) throw 'Media no compatible.'
 
   const tempDir = global.tempDir || './tmp'
   const input = path.join(tempDir, `${Date.now()}.${ext}`)
@@ -69,7 +60,7 @@ async function toWebp(buffer, opts = {}) {
   const options = [
     '-vcodec', 'libwebp',
     '-vf', `${aspectRatio}, fps=15, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff [p]; [b][p] paletteuse`,
-    ...(ext.match(/(mp4|mkv|m4p|gif|webm)/)
+    ...(ext.match(/(mp4|mkv|m4p|gif|webm)/) 
       ? ['-loop', '0', '-ss', '00:00:00', '-t', '00:00:10', '-preset', 'default', '-an', '-vsync', '0']
       : []
     )
@@ -96,4 +87,3 @@ async function toWebp(buffer, opts = {}) {
 function isUrl(text) {
   return /^https?:\/\/\S+\.(jpg|jpeg|png|gif|webp)$/i.test(text)
 }
-
