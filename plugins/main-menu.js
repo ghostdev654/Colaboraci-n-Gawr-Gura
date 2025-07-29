@@ -2,6 +2,7 @@ import fs from 'fs'
 import { join } from 'path'
 import { xpRange } from '../lib/levelling.js'
 
+// Decoraciones dinámicas para bordes
 const decorations = [
   '✧･ﾟ: *✧･ﾟ: 🦈* :･ﾟ✧ :･ﾟ✧',
   '✿･ﾟ: *✿･ﾟ: 🌊* :･ﾟ✿ :･ﾟ✿',
@@ -10,6 +11,7 @@ const decorations = [
   '✸･ﾟ: *✸･ﾟ: 💙* :･ﾟ✸ :･ﾟ✸',
 ]
 
+// Decoraciones dinámicas para textos internos
 const textStyles = [
   { greeting: 'ʜᴇʏ~ 🦈', activity: '✨ Actitud increíble', dateText: '🌊 Fecha hoy' },
   { greeting: 'ʜʏᴇᴇ~ 🌊', activity: '🌟 Potencia activa', dateText: '🐚 Día actual' },
@@ -73,7 +75,7 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
       }))
 
     let nombreBot = global.namebot || 'Bot'
-    let bannerFinal = 'https://files.catbox.moe/qifsi4.jpg' // ✅ Usa esta imagen desde internet
+    let bannerFinal = './storage/img/Menu3.jpg'
 
     const botActual = conn.user?.jid?.split('@')[0].replace(/\D/g, '')
     const configPath = join('./JadiBots', botActual, 'config.json')
@@ -94,6 +96,7 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
 
     const menuConfig = conn.menu || defaultMenu
 
+    // Animación indefinida
     let sentMessageID = null
     while (true) {
       const randomDecoration = decorations[Math.floor(Math.random() * decorations.length)]
@@ -143,4 +146,52 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
       }
 
       const text = _text.replace(
-        new RegExp(`%(${Object.keys(replace).sort((a, b) => b.length - a.length).join('|')})`,
+        new RegExp(`%(${Object.keys(replace).sort((a, b) => b.length - a.length).join('|')})`, 'g'),
+        (_, name) => String(replace[name])
+      )
+
+      const isURL = typeof bannerFinal === 'string' && /^https?:\/\//i.test(bannerFinal)
+      const imageContent = isURL
+        ? { image: { url: bannerFinal } }
+        : { image: fs.readFileSync(bannerFinal) }
+
+      if (!sentMessageID) {
+        const response = await conn.sendMessage(m.chat, {
+          ...imageContent,
+          caption: text.trim(),
+          mentionedJid: conn.parseMention(text),
+        }, { quoted: m })
+        sentMessageID = response.key.id
+      } else {
+        try {
+          await conn.modifyMessage(m.chat, sentMessageID, {
+            ...imageContent,
+            caption: text.trim(),
+          })
+        } catch (e) {
+          console.warn('No se pudo editar el mensaje:', e)
+          break // Salir del bucle si no se puede editar más
+        }
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 1000)) // Esperar 1 segundo antes de actualizar
+    }
+  } catch (e) {
+    console.error('❌ Error en el menú:', e)
+    conn.reply(m.chat, '❎ Lo sentimos, ocurrió un error inesperado.', m)
+  }
+}
+
+handler.command = ['menu', 'help', 'menú']
+export default handler
+
+// Utilidades
+const more = String.fromCharCode(8206)
+const readMore = more.repeat(4001)
+
+function clockString(ms) {
+  let h = isNaN(ms) ? '--' : Math.floor(ms / 3600000)
+  let m = isNaN(ms) ? '--' : Math.floor(ms / 60000) % 60
+  let s = isNaN(ms) ? '--' : Math.floor(ms / 1000) % 60
+  return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':')
+}
