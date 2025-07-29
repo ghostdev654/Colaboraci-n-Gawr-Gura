@@ -11,29 +11,31 @@ let handler = async (m, { conn, args }) => {
   let buffer
 
   try {
+    // 🦈 Gura detectando el tipo de archivo...
     if (/image|video|webp|tgs|webm/g.test(mime) && q.download) {
       if (/video|webm/.test(mime) && (q.msg || q).seconds > 11) {
-        return conn.reply(m.chat, '✦❀ Oops... Este sticker animado no puede durar más de *10* segundos ✿', m, rcanal)
+        return conn.reply(m.chat, `🌊 Uwaah~ Este video dura más de *10 segundos*.\n✨ Usa uno más cortito para que Gura lo convierta en sticker.`, m)
       }
       buffer = await q.download()
     } else if (args[0] && isUrl(args[0])) {
       const res = await fetch(args[0])
       buffer = await res.buffer()
     } else {
-      return conn.reply(m.chat, '✧ Responde con una *Imagen, Sticker, Video, Webm o Tgs* para convertirlo en sticker. ✿', m, rcanal)
+      return conn.reply(m.chat, `🫧 Hiii~ Responde a una *imagen, sticker, video, webm o tgs* para que Gura lo convierta en un sticker kawaii~! 💬`, m)
     }
 
-    await m.react('🕓')
+    await m.react('🕐') // cargando...
 
     const stickerData = await toWebp(buffer)
     const finalSticker = await addExif(stickerData, packname, author)
 
-    await conn.sendFile(m.chat, finalSticker, 'sticker.webp', '☁︎ Aquí tienes tu sticker ✦', m)
-    await m.react('✅')
+    await conn.sendFile(m.chat, finalSticker, 'sticker.webp', `✨ Aquí tienes tu sticker bonito~! 🐬`, m)
+    await m.react('✅') // éxito~
 
   } catch (e) {
-    await m.react('✖️')
-    console.error('❀ Error al crear sticker:', e)
+    await m.react('❌')
+    console.error('✖️ Gura encontró un error creando tu sticker:', e)
+    await conn.reply(m.chat, `💔 Uuuh... algo salió mal.\n🐟 Intenta de nuevo o usa otro archivo, desu~`, m)
   }
 }
 
@@ -45,7 +47,9 @@ export default handler
 
 async function toWebp(buffer, opts = {}) {
   const { ext } = await fromBuffer(buffer)
-  if (!/(png|jpg|jpeg|mp4|mkv|m4p|gif|webp|webm|tgs)/i.test(ext)) throw 'Media no compatible.'
+  if (!/(png|jpg|jpeg|mp4|mkv|m4p|gif|webp|webm|tgs)/i.test(ext)) {
+    throw '🚫 Este tipo de archivo no es compatible, nyan~'
+  }
 
   const tempDir = global.tempDir || './tmp'
   const input = path.join(tempDir, `${Date.now()}.${ext}`)
@@ -60,7 +64,7 @@ async function toWebp(buffer, opts = {}) {
   const options = [
     '-vcodec', 'libwebp',
     '-vf', `${aspectRatio}, fps=15, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff [p]; [b][p] paletteuse`,
-    ...(ext.match(/(mp4|mkv|m4p|gif|webm)/) 
+    ...(ext.match(/(mp4|mkv|m4p|gif|webm)/)
       ? ['-loop', '0', '-ss', '00:00:00', '-t', '00:00:10', '-preset', 'default', '-an', '-vsync', '0']
       : []
     )
