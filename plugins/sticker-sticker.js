@@ -5,37 +5,42 @@ import fluent from 'fluent-ffmpeg'
 import { fileTypeFromBuffer as fromBuffer } from 'file-type'
 import { addExif } from '../lib/sticker.js'
 
+const packname = global.packname || 'GuraBot 💙'
+const author = global.author || 'By Gawr Gura'
+
 let handler = async (m, { conn, args }) => {
   let q = m.quoted ? m.quoted : m
   let mime = (q.msg || q).mimetype || q.mediaType || ''
   let buffer
 
   try {
-    // 🦈 Gura detectando el tipo de archivo...
-    if (/image|video|webp|tgs|webm/g.test(mime) && q.download) {
-      if (/video|webm/.test(mime) && (q.msg || q).seconds > 11) {
-        return conn.reply(m.chat, `🌊 Uwaah~ Este video dura más de *10 segundos*.\n✨ Usa uno más cortito para que Gura lo convierta en sticker.`, m)
+    if (/image|video|webp|tgs|webm/.test(mime) && q.download) {
+      if (/video|webm/.test(mime) && ((q.msg || q).seconds || 0) > 11) {
+        return m.reply('🌊 Uwaah~ Este video es muy largo.\n✨ Usa uno de *máximo 10 segundos*, nyan~')
       }
       buffer = await q.download()
     } else if (args[0] && isUrl(args[0])) {
       const res = await fetch(args[0])
       buffer = await res.buffer()
     } else {
-      return conn.reply(m.chat, `🫧 Hiii~ Responde a una *imagen, sticker, video, webm o tgs* para que Gura lo convierta en un sticker kawaii~! 💬`, m)
+      return m.reply('🫧 Hiii~ Responde a una *imagen, sticker, video, webm o tgs* para convertirlo en un sticker bonito~')
     }
+
+    if (!buffer) throw '❌ No se pudo obtener el archivo.'
 
     await m.react('🕐') // cargando...
 
     const stickerData = await toWebp(buffer)
     const finalSticker = await addExif(stickerData, packname, author)
 
-    await conn.sendFile(m.chat, finalSticker, 'sticker.webp', `✨ Aquí tienes tu sticker bonito~! 🐬`, m)
-    await m.react('✅') // éxito~
+    if (!finalSticker) throw 'No se pudo generar el sticker :('
 
+    await conn.sendFile(m.chat, finalSticker, 'sticker.webp', '✨ Aquí está tu sticker, desu~!', m)
+    await m.react('✅')
   } catch (e) {
     await m.react('❌')
-    console.error('✖️ Gura encontró un error creando tu sticker:', e)
-    await conn.reply(m.chat, `💔 Uuuh... algo salió mal.\n🐟 Intenta de nuevo o usa otro archivo, desu~`, m)
+    console.error('🚨 Error al generar el sticker:', e)
+    await m.reply('💔 Uuh~ Gura no pudo crear tu sticker...\nIntenta con otro archivo o revisa que sea compatible.')
   }
 }
 
@@ -48,7 +53,7 @@ export default handler
 async function toWebp(buffer, opts = {}) {
   const { ext } = await fromBuffer(buffer)
   if (!/(png|jpg|jpeg|mp4|mkv|m4p|gif|webp|webm|tgs)/i.test(ext)) {
-    throw '🚫 Este tipo de archivo no es compatible, nyan~'
+    throw '🌊 Archivo no compatible.'
   }
 
   const tempDir = global.tempDir || './tmp'
@@ -91,3 +96,4 @@ async function toWebp(buffer, opts = {}) {
 function isUrl(text) {
   return /^https?:\/\/\S+\.(jpg|jpeg|png|gif|webp)$/i.test(text)
 }
+
