@@ -2,7 +2,6 @@ import fs from 'fs'
 import { join } from 'path'
 import { xpRange } from '../lib/levelling.js'
 
-// Decoraciones dinámicas para bordes
 const decorations = [
   '✧･ﾟ: *✧･ﾟ: 🦈* :･ﾟ✧ :･ﾟ✧',
   '✿･ﾟ: *✿･ﾟ: 🌊* :･ﾟ✿ :･ﾟ✿',
@@ -11,7 +10,6 @@ const decorations = [
   '✸･ﾟ: *✸･ﾟ: 💙* :･ﾟ✸ :･ﾟ✸',
 ]
 
-// Decoraciones dinámicas para textos internos
 const textStyles = [
   { greeting: 'ʜᴇʏ~ 🦈', activity: '✨ Actitud increíble', dateText: '🌊 Fecha hoy' },
   { greeting: 'ʜʏᴇᴇ~ 🌊', activity: '🌟 Potencia activa', dateText: '🐚 Día actual' },
@@ -96,86 +94,68 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
 
     const menuConfig = conn.menu || defaultMenu
 
-    // Animación indefinida
-    let sentMessageID = null
-    while (true) {
-      const randomDecoration = decorations[Math.floor(Math.random() * decorations.length)]
-      const randomTextStyle = textStyles[Math.floor(Math.random() * textStyles.length)]
+    const randomDecoration = decorations[Math.floor(Math.random() * decorations.length)]
+    const randomTextStyle = textStyles[Math.floor(Math.random() * textStyles.length)]
 
-      const _text = [
-        menuConfig.before,
-        ...Object.keys(tags).map(tag => {
-          return [
-            menuConfig.header
-              .replace(/%category/g, tags[tag])
-              .replace(/%decoration/g, randomDecoration),
-            help.filter(menu => menu.tags?.includes(tag)).map(menu =>
-              menu.help.map(helpText =>
-                menuConfig.body
-                  .replace(/%cmd/g, menu.prefix ? helpText : `${_p}${helpText}`)
-                  .replace(/%islimit/g, menu.limit ? '◜⭐◞' : '')
-                  .replace(/%isPremium/g, menu.premium ? '◜🪪◞' : '')
-                  .trim()
-              ).join('\n')
-            ).join('\n'),
-            menuConfig.footer,
-          ].join('\n')
-        }),
-        menuConfig.after,
-      ].join('\n')
+    const _text = [
+      menuConfig.before,
+      ...Object.keys(tags).map(tag => {
+        return [
+          menuConfig.header
+            .replace(/%category/g, tags[tag])
+            .replace(/%decoration/g, randomDecoration),
+          help.filter(menu => menu.tags?.includes(tag)).map(menu =>
+            menu.help.map(helpText =>
+              menuConfig.body
+                .replace(/%cmd/g, menu.prefix ? helpText : `${_p}${helpText}`)
+                .replace(/%islimit/g, menu.limit ? '◜⭐◞' : '')
+                .replace(/%isPremium/g, menu.premium ? '◜🪪◞' : '')
+                .trim()
+            ).join('\n')
+          ).join('\n'),
+          menuConfig.footer,
+        ].join('\n')
+      }),
+      menuConfig.after,
+    ].join('\n')
 
-      const replace = {
-        '%': '%',
-        p: _p,
-        botname: nombreBot,
-        taguser: '@' + m.sender.split('@')[0],
-        exp: exp - min,
-        maxexp: xp,
-        totalexp: exp,
-        xp4levelup: max - exp,
-        level,
-        limit,
-        name,
-        date,
-        uptime: clockString(process.uptime() * 1000),
-        tipo,
-        readmore: readMore,
-        greeting: randomTextStyle.greeting,
-        activity: randomTextStyle.activity,
-        dateText: randomTextStyle.dateText,
-      }
-
-      const text = _text.replace(
-        new RegExp(`%(${Object.keys(replace).sort((a, b) => b.length - a.length).join('|')})`, 'g'),
-        (_, name) => String(replace[name])
-      )
-
-      const isURL = typeof bannerFinal === 'string' && /^https?:\/\//i.test(bannerFinal)
-      const imageContent = isURL
-        ? { image: { url: bannerFinal } }
-        : { image: fs.readFileSync(bannerFinal) }
-
-      if (!sentMessageID) {
-        const response = await conn.sendMessage(m.chat, {
-          ...imageContent,
-          caption: text.trim(),
-          mentionedJid: conn.parseMention(text),
-        }, { quoted: m })
-        sentMessageID = response.key.id
-      } else {
-        try {
-          await conn.modifyMessage(m.chat, sentMessageID, {
-            ...imageContent,
-            caption: text.trim(),
-          })
-        } catch (e) {
-          console.warn('No se pudo editar el mensaje:', e)
-          break // Salir del bucle si no se puede editar más
-        }
-      }
-
-      await new Promise(resolve => setTimeout(resolve, 1000)) // Esperar 1 segundo antes de actualizar
+    const replace = {
+      '%': '%',
+      p: _p,
+      botname: nombreBot,
+      taguser: '@' + m.sender.split('@')[0],
+      exp: exp - min,
+      maxexp: xp,
+      totalexp: exp,
+      xp4levelup: max - exp,
+      level,
+      limit,
+      name,
+      date,
+      uptime: clockString(process.uptime() * 1000),
+      tipo,
+      readmore: readMore,
+      greeting: randomTextStyle.greeting,
+      activity: randomTextStyle.activity,
+      dateText: randomTextStyle.dateText,
     }
+
+    const text = _text.replace(
+      new RegExp(`%(${Object.keys(replace).sort((a, b) => b.length - a.length).join('|')})`, 'g'),
+      (_, name) => String(replace[name])
+    )
+
+    const isURL = typeof bannerFinal === 'string' && /^https?:\/\//i.test(bannerFinal)
+    const imageContent = isURL
+      ? { image: { url: bannerFinal } }
+      : { image: fs.readFileSync(bannerFinal) }
+
+    await conn.sendMessage(m.chat, {
+      ...imageContent,
+      caption: text.trim(),
+      mentionedJid: conn.parseMention(text),
+    }, { quoted: m })
+
   } catch (e) {
     console.error('❌ Error en el menú:', e)
     conn.reply(m.chat, '❎ Lo sentimos, ocurrió un error inesperado.', m)
@@ -185,7 +165,6 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
 handler.command = ['menu', 'help', 'menú']
 export default handler
 
-// Utilidades
 const more = String.fromCharCode(8206)
 const readMore = more.repeat(4001)
 
