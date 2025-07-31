@@ -32,7 +32,7 @@ const handler = async (m, { conn }) => {
   await conn.sendMessage(m.chat, { text: '✅ Purga completada.' });
 };
 
-handler.command = ['purga'];
+handler.command = ['purgamegasupremaultra'];
 handler.group = true;
 
 export default handler;
