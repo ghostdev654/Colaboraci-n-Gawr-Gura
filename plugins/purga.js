@@ -1,13 +1,21 @@
-const handler = async (m, { conn, participants, isBotAdmin, isAdmin, groupMetadata, text }) => {
+const handler = async (m, { conn }) => {
   if (!m.isGroup) throw '❌ Este comando solo funciona en grupos';
+
+  const groupMetadata = await conn.groupMetadata(m.chat);
+  const participants = groupMetadata.participants;
+  const sender = m.sender;
+
+  const botNumber = conn.user.id.split(':')[0] + '@s.whatsapp.net';
+  const isBotAdmin = participants.find(p => p.id === botNumber)?.admin !== null;
+  const isAdmin = participants.find(p => p.id === sender)?.admin !== null;
+
   if (!isAdmin) throw '❌ Solo los administradores pueden usar este comando';
   if (!isBotAdmin) throw '❌ Necesito ser administrador para eliminar miembros';
 
-  let ownerGroup = groupMetadata.owner || participants.find(p => p.admin === 'superadmin')?.id;
+  const ownerGroup = groupMetadata.owner || participants.find(p => p.admin === 'superadmin')?.id;
 
-  // Filtrar a todos los que no sean el bot ni el dueño del grupo
-  let toKick = participants
-    .filter(p => p.id !== conn.user.id && p.id !== ownerGroup)
+  const toKick = participants
+    .filter(p => p.id !== botNumber && p.id !== ownerGroup)
     .map(p => p.id);
 
   if (!toKick.length) throw '✅ No hay nadie para eliminar.';
@@ -17,9 +25,9 @@ const handler = async (m, { conn, participants, isBotAdmin, isAdmin, groupMetada
   for (let user of toKick) {
     try {
       await conn.groupParticipantsUpdate(m.chat, [user], 'remove');
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Espera para evitar spam
+      await new Promise(res => setTimeout(res, 1500));
     } catch (e) {
-      console.log(`❌ No se pudo eliminar a ${user}`);
+      console.log(`❌ No se pudo eliminar a ${user}:`, e);
     }
   }
 
