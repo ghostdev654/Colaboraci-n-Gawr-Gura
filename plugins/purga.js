@@ -27,8 +27,8 @@ const handler = async (m, { conn, participants, isBotAdmin, isAdmin, groupMetada
 };
 
 handler.command = ['purga'];
-handler.group = false;
+handler.group = true;
 handler.admin = false;
-handler.botAdmin = true;
+handler.botAdmin = false;
 
 export default handler;
