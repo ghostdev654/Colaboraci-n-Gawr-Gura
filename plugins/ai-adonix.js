@@ -2,58 +2,38 @@ import fetch from 'node-fetch';
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
   if (!text) {
-    return m.reply(`🤖 *Adonix IA* 🤖\n\nUsa:\n${usedPrefix + command} [tu pregunta]\n\nEjemplo:\n${usedPrefix + command} haz un resumen de los dinosaurios`);
+    return m.reply(`🦈 *Gura IA sin llave* está lista para ayudarte~\n\nUsa:\n${usedPrefix + command} [tu pregunta]\n📌 Ejemplo:\n${usedPrefix + command} ¿Qué es Gawr Gura?`);
   }
 
+  await m.react('🔹');
+
   try {
-    await m.react('🕒');
-
-    const body = {
-      model: "llama-vision-free", // modelo que sí está disponible
-      messages: [
-        {
-          role: "user",
-          content: text
-        }
-      ]
-    };
-
-    const response = await fetch("https://api.aimlapi.com/v1/chat/completions", {
-      method: "POST",
+    const response = await fetch(`https://free-unoficial-gpt4o-mini-api-g70n.onrender.com/chat/?query=${encodeURIComponent(text)}`, {
+      method: 'GET',
       headers: {
-        "Authorization": "Bearer 57211fe739784450b94b09a694e128a1", // tu API Key
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(body)
+        'Accept': 'application/json'
+      }
     });
 
-    const resText = await response.text();
-
-    let data;
-    try {
-      data = JSON.parse(resText);
-    } catch (err) {
-      console.error("❌ La respuesta no fue JSON válido:", resText);
-      return m.reply("❌ La API respondió un formato no válido:\n\n" + resText);
+    const data = await response.json();
+    if (!data || !data.reply && !data.choices) {
+      throw new Error('Formato inesperado en respuesta');
     }
 
-    if (!data.choices || !data.choices.length || !data.choices[0].message) {
-      return m.reply("❌ Ocurrió un error al consultar con la IA. No se obtuvo respuesta válida.");
-    }
+    // Algunos endpoints devuelven distinta estructura
+    const reply = data.reply || (data.choices?.[0]?.message?.content) || (Array.isArray(data) && data[0]?.text) || JSON.stringify(data);
 
-    const respuesta = data.choices[0].message.content;
-    await m.reply(`🌵 *Adonix IA - Llama Vision Free:*\n\n${respuesta}`);
+    await m.reply(`🐬 *Gura dice:*\n\n${reply.trim()}\n\n🌊 _free‑GPT sin llave_`);
     await m.react('✅');
-
   } catch (e) {
-    console.error('[ERROR ADONIX IA]', e);
+    console.error('[ERROR GURA IA GRATIS]', e);
     await m.react('❌');
-    return m.reply(`❌ Error al usar Adonix IA:\n\n${e.message}`);
+    await m.reply(`⚠️ Gura IA no pudo responder:\n\n${e.message}`);
   }
 };
 
-handler.help = ['adonix <pregunta>'];
+handler.help = ['guraia <pregunta>'];
 handler.tags = ['ia'];
-handler.command = ['adonix', 'ai', 'adonixia'];
+handler.command = ['guraia', 'gptgratis', 'aifree'];
 
 export default handler;
