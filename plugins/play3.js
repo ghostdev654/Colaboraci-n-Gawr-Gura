@@ -4,16 +4,18 @@ import { generateWAMessageFromContent } from '@whiskeysockets/baileys';
 
 const handler = async (m, { conn, args, usedPrefix }) => {
   if (!args[0]) {
-    return conn.reply(m.chat, `🦈 *Gura te dice~*: Ingresa un título para buscar en YouTube.
+    return conn.reply(m.chat, `✏️ Ingresa un título para buscar en YouTube.
 
-✨ *Ejemplo:*
+Ejemplo:
 > ${usedPrefix}play Corazón Serrano - Mix Poco Yo`, m);
   }
 
   await m.react('🔍');
 
   await conn.sendMessage(m.chat, { 
-    text: `🌊 *Gura está buceando en YouTube...*\n🔎 _Buscando:_ ${args.join(" ")}\n🐟 Por favor espera unos segundos...`, 
+    text: `⏳ *Buscando...*
+🔎 ${args.join(" ")}
+_Por favor espera un momento..._`, 
     tts: false 
   }, { quoted: m });
 
@@ -30,20 +32,18 @@ const handler = async (m, { conn, args, usedPrefix }) => {
     const sugerencias = formatSuggestions(randomSuggestions);
 
     const fullMessage = 
-`🦈 *Gura encontró algo adorable para ti~* 💙
+`${messageText}
 
-${messageText}
-
-📌 *Sugerencias misteriosas del océano:*
+🔎 *Sugerencias relacionadas:*
 ${sugerencias}`;
 
     await conn.sendMessage(m.chat, {
       image: thumbnail,
       caption: fullMessage,
-      footer: `🔱 GuraBot by Wirk — powered by la magia de las olas 🌊`,
+      footer: `💎 Shadow Ultra Edited 🐻‍❄️ By Wirk 🥮`,
       contextInfo: {
         mentionedJid: [m.sender],
-        forwardingScore: 2024,
+        forwardingScore: 1000,
         isForwarded: true
       },
       buttons: generateButtons(video, usedPrefix),
@@ -56,17 +56,17 @@ ${sugerencias}`;
   } catch (e) {
     console.error(e);
     await m.react('❌');
-    conn.reply(m.chat, '💔 *Gura-chan no pudo encontrar ese video... intenta con otra búsqueda~*', m);
+    conn.reply(m.chat, '❗ Ocurrió un error al buscar el video. Inténtalo de nuevo más tarde.', m);
   }
 };
 
-handler.help = ['play3'];
+handler.help = ['play'];
 handler.tags = ['descargas'];
-handler.command = ['play3'];
+handler.command = ['play'];
 
 export default handler;
 
-// 🔍 Búsqueda en YouTube
+// Función de búsqueda YouTube
 async function searchVideos(query) {
   try {
     const res = await yts(query);
@@ -75,57 +75,59 @@ async function searchVideos(query) {
       url: video.url,
       thumbnail: video.thumbnail,
       channel: video.author.name,
-      published: video.timestamp || 'Desconocido',
-      views: video.views?.toLocaleString() || 'N/A',
+      published: video.timestamp || 'No disponible',
+      views: video.views?.toLocaleString() || 'No disponible',
       duration: video.duration.timestamp || 'No disponible'
     }));
   } catch (error) {
-    console.error('❌ Error en yt-search:', error.message);
+    console.error('Error en yt-search:', error.message);
     return [];
   }
 }
 
-// 🎀 Formato principal del mensaje
+// Formato visual del resultado principal
 function formatMessageText(video) {
   return (
-`🎬 *Título:* ${video.title}
-⏳ *Duración:* ${video.duration}
-👤 *Canal:* ${video.channel}
-📅 *Publicado:* ${convertTimeToSpanish(video.published)}
-👁️ *Vistas:* ${video.views}
-🌐 *Enlace:* ${video.url}`
+    `🎥 *Video encontrado*
+
+📌 Título: ${video.title}
+⏳ Duración: ${video.duration}
+👤 Canal: ${video.channel}
+🗓 Publicado: ${convertTimeToSpanish(video.published)}
+👁 Vistas: ${video.views}
+🔗 Enlace: ${video.url}`
   );
 }
 
-// 🪸 Sugerencias de Gura
+// Formato de sugerencias ordenado
 function formatSuggestions(suggestions) {
   return suggestions.map((v, i) => 
-    `🪷 ${i + 1}. ${truncateTitle(v.title)}\n🔗 ${v.url}`
+    `🔸 ${i + 1}. ${truncateTitle(v.title)}\n🔗 ${v.url}`
   ).join('\n');
 }
 
-// ⛏️ Recorta títulos largos
+// Recorta títulos largos
 function truncateTitle(title, maxLength = 50) {
   return title.length > maxLength ? title.slice(0, maxLength - 3) + '...' : title;
 }
 
-// 🧜 Botones para audio y video
+// Botones visuales
 function generateButtons(video, usedPrefix) {
   return [
     {
       buttonId: `${usedPrefix}ytmp3 ${video.url}`,
-      buttonText: { displayText: '🎧 Descargar MP3' },
+      buttonText: { displayText: '🎧 MP3 (Audio)' },
       type: 1
     },
     {
       buttonId: `${usedPrefix}ytmp4 ${video.url}`,
-      buttonText: { displayText: '🎥 Descargar MP4' },
+      buttonText: { displayText: '🎬 MP4 (Video)' },
       type: 1
     }
   ];
 }
 
-// 🌊 Traducción de tiempo
+// Traducir fechas
 function convertTimeToSpanish(timeText) {
   return timeText
     .replace(/years?/, 'años')
@@ -140,7 +142,7 @@ function convertTimeToSpanish(timeText) {
     .replace(/minute/, 'minuto');
 }
 
-// 🐠 Mezcla sugerencias aleatoriamente
+// Array aleatorio
 function shuffleArray(arr) {
   return arr.sort(() => Math.random() - 0.5);
 }
