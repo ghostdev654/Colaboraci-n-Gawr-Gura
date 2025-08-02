@@ -2,45 +2,36 @@ import fetch from 'node-fetch';
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
   if (!text) {
-    return m.reply(`🤖 *Adonix IA* 🤖\n\nUsa:\n${usedPrefix + command} [tu pregunta]\n\nEjemplo:\n${usedPrefix + command} haz un código JS que sume dos números`);
+    return m.reply(`🦈 *Gura IA* te espera para ayudarte~\n\n📌 Usa:\n${usedPrefix + command} [tu pregunta]\n\n💬 Ejemplo:\n${usedPrefix + command} haz un código JS que sume dos números`);
   }
 
   try {
-    await m.react('🕒');
+    await m.react('💭');
 
-    const apiURL = `https://theadonix-api.vercel.app/api/adonix?q=${encodeURIComponent(text)}`;
-    const res = await fetch(apiURL);
+    const apiKey = '57211fe739784450b94b09a694e128a1';
+    const url = 'https://aimlapi.com/api/v1/aiml';
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey
+      },
+      body: JSON.stringify({
+        prompt: text,
+        // Puedes personalizar más parámetros si la API los admite
+      })
+    });
+
     const data = await res.json();
 
-    // 📷 Imagen generada
-    if (data.imagen_generada) {
-      await conn.sendMessage(m.chat, {
-        image: { url: data.imagen_generada },
-        caption: `🖼️ *Adonix IA* generó esta imagen:\n\n📌 _${data.pregunta}_\n${data.mensaje || ''}`,
-      }, { quoted: m });
-      await m.react('✅');
-      return;
-    }
-
-    // 🎤 Audio tipo PTT sin externalAdReply
-    if (data.audio && typeof data.audio === 'string') {
-      await conn.sendMessage(m.chat, {
-        audio: { url: data.audio },
-        ptt: true,
-        mimetype: 'audio/mpeg',
-        fileName: `adonix-voz.mp3`
-      }, { quoted: m });
-      await m.react('✅');
-      return;
-    }
-
-    // 🧠 Texto con o sin código
-    if (data.respuesta && typeof data.respuesta === 'string') {
-      const [mensaje, ...codigo] = data.respuesta.split(/```(?:javascript|js|html|)/i);
-      let respuestaFinal = `🌵 *Adonix IA :*\n\n${mensaje.trim()}`;
+    // 💬 Texto de respuesta
+    if (data && data.response) {
+      const [mensaje, ...codigo] = data.response.split(/```(?:javascript|js|html)?/i);
+      let respuestaFinal = `🌊 *Gura IA responde:*\n\n${mensaje.trim()}`;
 
       if (codigo.length > 0) {
-        respuestaFinal += `\n\n💻 *Código:*\n\`\`\`js\n${codigo.join('```').trim().slice(0, 3900)}\n\`\`\``;
+        respuestaFinal += `\n\n💻 *Código generado:*\n\`\`\`js\n${codigo.join('```').trim().slice(0, 3900)}\n\`\`\``;
       }
 
       await m.reply(respuestaFinal);
@@ -48,14 +39,36 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
       return;
     }
 
-    // ❌ Ninguna respuesta válida
+    // 🎤 Si viniera audio generado (solo si la API lo soporta)
+    if (data.audio) {
+      await conn.sendMessage(m.chat, {
+        audio: { url: data.audio },
+        mimetype: 'audio/mpeg',
+        ptt: true,
+        fileName: `gura-ai.mp3`
+      }, { quoted: m });
+      await m.react('✅');
+      return;
+    }
+
+    // 🖼️ Si viniera una imagen generada (si la API lo soporta)
+    if (data.image) {
+      await conn.sendMessage(m.chat, {
+        image: { url: data.image },
+        caption: `📷 *Imagen creada por Gura IA*\n\n🖌️ _${text}_`,
+      }, { quoted: m });
+      await m.react('✅');
+      return;
+    }
+
+    // ⚠️ Si no hubo respuesta válida
     await m.react('❌');
-    return m.reply('❌ No se pudo procesar la respuesta de Adonix IA.');
+    return m.reply('❌ Gura-chan no pudo procesar esta pregunta, nyah~');
 
   } catch (e) {
-    console.error('[ERROR ADONIX IA]', e);
+    console.error('[ERROR GURA IA]', e);
     await m.react('❌');
-    return m.reply(`❌ Error al usar Adonix IA:\n\n${e.message}`);
+    return m.reply(`⚠️ *Gura IA falló:* ${e.message}`);
   }
 };
 
