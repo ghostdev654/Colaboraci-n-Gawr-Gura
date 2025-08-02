@@ -1,135 +1,119 @@
-import yts from 'yt-search';
-import fetch from 'node-fetch';
-import { generateWAMessageFromContent } from '@whiskeysockets/baileys';
+import yts from 'yt-search'
+import fetch from 'node-fetch'
 
 const handler = async (m, { conn, args, usedPrefix }) => {
   if (!args[0]) {
-    return conn.reply(m.chat, `✏️ Ingresa un título para buscar en YouTube.
-
-Ejemplo:
-> ${usedPrefix}play Corazón Serrano - Mix Poco Yo`, m);
+    return conn.reply(m.chat, `🦈 *Gura te dice:*\n\n✏️ Ingresa un título para buscar en YouTube.\n\n📌 Ejemplo:\n> ${usedPrefix}play Corazón Serrano - Mix Poco Yo`, m)
   }
 
-  await m.react('🔍');
+  await m.react('🔍')
 
-  await conn.sendMessage(m.chat, { 
-    text: `⏳ *Buscando...*
-🔎 ${args.join(" ")}
-_Por favor espera un momento..._`, 
-    tts: false 
-  }, { quoted: m });
+  await conn.sendMessage(m.chat, {
+    text: `🌊 *Gura está nadando por YouTube...*\n\n🔎 *Buscando:* _${args.join(" ")}_\n\n⏳ Por favor espera un poco...`,
+  }, { quoted: m })
 
   try {
-    const searchResults = await searchVideos(args.join(" "));
+    const searchResults = await searchVideos(args.join(" "))
 
-    if (!searchResults.length) throw new Error('No se encontraron resultados.');
+    if (!searchResults.length) throw new Error('No se encontraron resultados.')
 
-    const video = searchResults[0];
-    const thumbnail = await (await fetch(video.thumbnail)).buffer();
+    const video = searchResults[0]
+    const thumbnail = await (await fetch(video.thumbnail)).buffer()
 
-    const messageText = formatMessageText(video);
-    const randomSuggestions = shuffleArray(searchResults.slice(1)).slice(0, 3);
-    const sugerencias = formatSuggestions(randomSuggestions);
+    const mensajePrincipal = formatMessageText(video)
+    const sugerencias = formatSuggestions(shuffleArray(searchResults.slice(1)).slice(0, 3))
 
-    const fullMessage = 
-`${messageText}
-
-🔎 *Sugerencias relacionadas:*
-${sugerencias}`;
+    const fullMessage = `🦈 *Gura encontró este video:*\n\n${mensajePrincipal}\n\n🔎 *Sugerencias acuáticas:*\n${sugerencias}`
 
     await conn.sendMessage(m.chat, {
       image: thumbnail,
       caption: fullMessage,
-      footer: `💎 Shadow Ultra Edited 🐻‍❄️ By Wirk 🥮`,
-      contextInfo: {
-        mentionedJid: [m.sender],
-        forwardingScore: 1000,
-        isForwarded: true
-      },
-      buttons: generateButtons(video, usedPrefix),
-      headerType: 1,
-      viewOnce: true
-    }, { quoted: m });
+      footer: `✨ Gawr Gura Bot 🩵 powered by Wirk`,
+      templateButtons: [
+        {
+          index: 1,
+          urlButton: {
+            displayText: "🌐 Ver en YouTube",
+            url: video.url,
+          },
+        },
+        {
+          index: 2,
+          quickReplyButton: {
+            displayText: "🎧 Descargar MP3",
+            id: `${usedPrefix}ytmp3 ${video.url}`,
+          },
+        },
+        {
+          index: 3,
+          quickReplyButton: {
+            displayText: "🎥 Descargar MP4",
+            id: `${usedPrefix}ytmp4 ${video.url}`,
+          },
+        },
+      ],
+      headerType: 4, // imageMessage
+    }, { quoted: m })
 
-    await m.react('✅');
+    await m.react('✅')
 
   } catch (e) {
-    console.error(e);
-    await m.react('❌');
-    conn.reply(m.chat, '❗ Ocurrió un error al buscar el video. Inténtalo de nuevo más tarde.', m);
+    console.error(e)
+    await m.react('❌')
+    conn.reply(m.chat, '❗ Ocurrió un error mientras buceábamos en YouTube. Inténtalo más tarde.', m)
   }
-};
+}
 
-handler.help = ['play3'];
-handler.tags = ['descargas'];
-handler.command = ['play3'];
+handler.help = ['play']
+handler.tags = ['descargas']
+handler.command = ['play']
 
-export default handler;
+export default handler
 
-// Función de búsqueda YouTube
+// Función para buscar videos en YouTube
 async function searchVideos(query) {
   try {
-    const res = await yts(query);
+    const res = await yts(query)
     return res.videos.slice(0, 10).map(video => ({
       title: video.title,
       url: video.url,
       thumbnail: video.thumbnail,
       channel: video.author.name,
-      published: video.timestamp || 'No disponible',
-      views: video.views?.toLocaleString() || 'No disponible',
-      duration: video.duration.timestamp || 'No disponible'
-    }));
+      published: video.timestamp || 'Desconocido',
+      views: video.views?.toLocaleString() || 'Desconocido',
+      duration: video.duration.timestamp || 'Desconocido'
+    }))
   } catch (error) {
-    console.error('Error en yt-search:', error.message);
-    return [];
+    console.error('❌ Error en yt-search:', error.message)
+    return []
   }
 }
 
-// Formato visual del resultado principal
+// Formato principal del video
 function formatMessageText(video) {
-  return (
-    `🎥 *Video encontrado*
-
-📌 Título: ${video.title}
-⏳ Duración: ${video.duration}
-👤 Canal: ${video.channel}
-🗓 Publicado: ${convertTimeToSpanish(video.published)}
-👁 Vistas: ${video.views}
-🔗 Enlace: ${video.url}`
-  );
+  return `📌 *Título:* ${video.title}
+⏳ *Duración:* ${video.duration}
+🎙️ *Canal:* ${video.channel}
+🗓️ *Publicado:* ${convertTimeToSpanish(video.published)}
+👁️ *Vistas:* ${video.views}
+🔗 *Enlace:* ${video.url}`
 }
 
-// Formato de sugerencias ordenado
-function formatSuggestions(suggestions) {
-  return suggestions.map((v, i) => 
-    `🔸 ${i + 1}. ${truncateTitle(v.title)}\n🔗 ${v.url}`
-  ).join('\n');
+// Lista de sugerencias formateadas
+function formatSuggestions(videos) {
+  return videos.map((v, i) =>
+    `🔹 ${i + 1}. ${truncateTitle(v.title)}\n🔗 ${v.url}`
+  ).join('\n')
 }
 
 // Recorta títulos largos
 function truncateTitle(title, maxLength = 50) {
-  return title.length > maxLength ? title.slice(0, maxLength - 3) + '...' : title;
+  return title.length > maxLength ? title.slice(0, maxLength - 3) + '...' : title
 }
 
-// Botones visuales
-function generateButtons(video, usedPrefix) {
-  return [
-    {
-      buttonId: `${usedPrefix}ytmp3 ${video.url}`,
-      buttonText: { displayText: '🎧 MP3 (Audio)' },
-      type: 1
-    },
-    {
-      buttonId: `${usedPrefix}ytmp4 ${video.url}`,
-      buttonText: { displayText: '🎬 MP4 (Video)' },
-      type: 1
-    }
-  ];
-}
-
-// Traducir fechas
-function convertTimeToSpanish(timeText) {
-  return timeText
+// Convierte fechas al español
+function convertTimeToSpanish(t) {
+  return t
     .replace(/years?/, 'años')
     .replace(/months?/, 'meses')
     .replace(/days?/, 'días')
@@ -139,10 +123,10 @@ function convertTimeToSpanish(timeText) {
     .replace(/month/, 'mes')
     .replace(/day/, 'día')
     .replace(/hour/, 'hora')
-    .replace(/minute/, 'minuto');
+    .replace(/minute/, 'minuto')
 }
 
-// Array aleatorio
+// Mezcla aleatoriamente un array
 function shuffleArray(arr) {
-  return arr.sort(() => Math.random() - 0.5);
+  return arr.sort(() => Math.random() - 0.5)
 }
