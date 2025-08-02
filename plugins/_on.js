@@ -2,8 +2,8 @@ import fetch from 'node-fetch'
 
 let linkRegex = /chat\.whatsapp\.com\/[0-9A-Za-z]{20,24}/i
 let linkRegex1 = /whatsapp\.com\/channel\/[0-9A-Za-z]{20,24}/i
-const defaultImage = 'https://files.catbox.moe/felkw2.jpg'
-const byeImage = 'https://files.catbox.moe/fkm1jz.jpg' // Imagen personalizada para despedidas
+const defaultImage = 'https://files.catbox.moe/8sl0sc.jpg'
+const byeImage = 'https://files.catbox.moe/e2n2sq.jpg' // Imagen personalizada para despedidas
 
 // Helper para checar si es admin o owner
 async function isAdminOrOwner(m, conn) {
