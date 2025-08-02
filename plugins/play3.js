@@ -3,56 +3,37 @@ import fetch from 'node-fetch'
 
 const handler = async (m, { conn, args, usedPrefix }) => {
   if (!args[0]) {
-    return conn.reply(m.chat, `🦈 *Gura te dice:*\n\n✏️ Ingresa un título para buscar en YouTube.\n\n📌 Ejemplo:\n> ${usedPrefix}play Corazón Serrano - Mix Poco Yo`, m)
+    return conn.reply(m.chat, `🦈 *Gura dice:*\n\n✏️ Ingresa un título para buscar en YouTube.\n\n📌 Ejemplo:\n> ${usedPrefix}play Un mix bien sabroso`, m)
   }
 
   await m.react('🔍')
 
-  await conn.sendMessage(m.chat, {
-    text: `🌊 *Gura está nadando por YouTube...*\n\n🔎 *Buscando:* _${args.join(" ")}_\n\n⏳ Por favor espera un poco...`,
-  }, { quoted: m })
-
   try {
     const searchResults = await searchVideos(args.join(" "))
-
     if (!searchResults.length) throw new Error('No se encontraron resultados.')
 
     const video = searchResults[0]
-    const thumbnail = await (await fetch(video.thumbnail)).buffer()
+    const audioInfo = await getYTMP3(video.url)
 
-    const mensajePrincipal = formatMessageText(video)
-    const sugerencias = formatSuggestions(shuffleArray(searchResults.slice(1)).slice(0, 3))
-
-    const fullMessage = `🦈 *Gura encontró este video:*\n\n${mensajePrincipal}\n\n🔎 *Sugerencias acuáticas:*\n${sugerencias}`
+    if (!audioInfo || !audioInfo.audio || !audioInfo.audio.url) {
+      throw new Error('No se pudo obtener el audio.')
+    }
 
     await conn.sendMessage(m.chat, {
-      image: thumbnail,
-      caption: fullMessage,
-      footer: `✨ Gawr Gura Bot 🩵 powered by Wirk`,
-      templateButtons: [
-        {
-          index: 1,
-          urlButton: {
-            displayText: "🌐 Ver en YouTube",
-            url: video.url,
-          },
-        },
-        {
-          index: 2,
-          quickReplyButton: {
-            displayText: "🎧 Descargar MP3",
-            id: `${usedPrefix}ytmp3 ${video.url}`,
-          },
-        },
-        {
-          index: 3,
-          quickReplyButton: {
-            displayText: "🎥 Descargar MP4",
-            id: `${usedPrefix}ytmp4 ${video.url}`,
-          },
-        },
-      ],
-      headerType: 4, // imageMessage
+      audio: { url: audioInfo.audio.url },
+      mimetype: 'audio/mpeg',
+      ptt: false,
+      fileName: `${video.title}.mp3`,
+      contextInfo: {
+        externalAdReply: {
+          title: `🎵 ${video.title}`,
+          body: '🦈 Gawr Gura Downloader',
+          thumbnailUrl: video.thumbnail,
+          mediaType: 2,
+          mediaUrl: video.url,
+          sourceUrl: video.url,
+        }
+      }
     }, { quoted: m })
 
     await m.react('✅')
@@ -60,28 +41,24 @@ const handler = async (m, { conn, args, usedPrefix }) => {
   } catch (e) {
     console.error(e)
     await m.react('❌')
-    conn.reply(m.chat, '❗ Ocurrió un error mientras buceábamos en YouTube. Inténtalo más tarde.', m)
+    conn.reply(m.chat, '❌ Ocurrió un error al buscar o descargar el audio. Intenta con otro título.', m)
   }
 }
 
-handler.help = ['play3']
+handler.help = ['play']
 handler.tags = ['descargas']
-handler.command = ['play3']
+handler.command = ['play']
 
 export default handler
 
-// Función para buscar videos en YouTube
+// Buscar en YouTube
 async function searchVideos(query) {
   try {
     const res = await yts(query)
-    return res.videos.slice(0, 10).map(video => ({
+    return res.videos.slice(0, 5).map(video => ({
       title: video.title,
       url: video.url,
       thumbnail: video.thumbnail,
-      channel: video.author.name,
-      published: video.timestamp || 'Desconocido',
-      views: video.views?.toLocaleString() || 'Desconocido',
-      duration: video.duration.timestamp || 'Desconocido'
     }))
   } catch (error) {
     console.error('❌ Error en yt-search:', error.message)
@@ -89,44 +66,14 @@ async function searchVideos(query) {
   }
 }
 
-// Formato principal del video
-function formatMessageText(video) {
-  return `📌 *Título:* ${video.title}
-⏳ *Duración:* ${video.duration}
-🎙️ *Canal:* ${video.channel}
-🗓️ *Publicado:* ${convertTimeToSpanish(video.published)}
-👁️ *Vistas:* ${video.views}
-🔗 *Enlace:* ${video.url}`
-}
-
-// Lista de sugerencias formateadas
-function formatSuggestions(videos) {
-  return videos.map((v, i) =>
-    `🔹 ${i + 1}. ${truncateTitle(v.title)}\n🔗 ${v.url}`
-  ).join('\n')
-}
-
-// Recorta títulos largos
-function truncateTitle(title, maxLength = 50) {
-  return title.length > maxLength ? title.slice(0, maxLength - 3) + '...' : title
-}
-
-// Convierte fechas al español
-function convertTimeToSpanish(t) {
-  return t
-    .replace(/years?/, 'años')
-    .replace(/months?/, 'meses')
-    .replace(/days?/, 'días')
-    .replace(/hours?/, 'horas')
-    .replace(/minutes?/, 'minutos')
-    .replace(/year/, 'año')
-    .replace(/month/, 'mes')
-    .replace(/day/, 'día')
-    .replace(/hour/, 'hora')
-    .replace(/minute/, 'minuto')
-}
-
-// Mezcla aleatoriamente un array
-function shuffleArray(arr) {
-  return arr.sort(() => Math.random() - 0.5)
+// Obtener enlace MP3 con API pública (no requiere API key)
+async function getYTMP3(url) {
+  try {
+    const res = await fetch(`https://api.lolhuman.xyz/api/ytmusic?apikey=GuraBot&url=${encodeURIComponent(url)}`)
+    const json = await res.json()
+    return json.status == 200 ? json.result : null
+  } catch (e) {
+    console.error('❌ Error al obtener MP3:', e.message)
+    return null
+  }
 }
