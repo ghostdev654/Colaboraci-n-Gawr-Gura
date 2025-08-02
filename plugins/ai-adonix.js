@@ -1,62 +1,71 @@
 import fetch from 'node-fetch';
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
-  if (!text) return m.reply(`🦈 *Gura Multi-IA* está lista~\n\n📌 Usa:\n${usedPrefix + command} [tu pregunta]\n💡 Ejemplo:\n${usedPrefix + command} ¿Qué es JavaScript?`);
+  if (!text) {
+    return m.reply(`🦈 *Gura IA Multifuente*\n\nUsa:\n${usedPrefix + command} [tu pregunta]\nEjemplo:\n${usedPrefix + command} ¿Qué es HTML?`);
+  }
 
-  await m.react('🔄');
+  await m.react('🔍');
 
-  const endpoints = [
-    query => `https://free-gpt4-api.dev/api/v1/gpt4?prompt=${encodeURIComponent(query)}`,
-    query => `https://freegptapi.vercel.app/api/gpt?text=${encodeURIComponent(query)}`,
-    query => `https://gpt-api-shaurya.vercel.app/api/gpt?prompt=${encodeURIComponent(query)}`,
-    query => `https://gpt4-free-api.vercel.app/api/completion?prompt=${encodeURIComponent(query)}`,
-    query => `https://chatgpt-free-pi.vercel.app/?question=${encodeURIComponent(query)}`,
-    query => `https://chatgpt-api-shared.vercel.app/?query=${encodeURIComponent(query)}`,
-    query => `https://gpt-4-api.vercel.app/api/gpt4?prompt=${encodeURIComponent(query)}`,
-    query => `https://chatgpt-api3-lovat.vercel.app/api/gpt?prompt=${encodeURIComponent(query)}`,
-    query => `https://gpt-free-open.vercel.app/api?prompt=${encodeURIComponent(query)}`,
-    query => `https://gpt-unofficial-api.vercel.app/chat/?query=${encodeURIComponent(query)}`,
+  const fuentes = [
+    q => `https://freegptapi.vercel.app/api/gpt?text=${encodeURIComponent(q)}`,
+    q => `https://gpt-api.shaurya.workers.dev/?prompt=${encodeURIComponent(q)}`,
+    q => `https://gpt4api.up.railway.app/ask?prompt=${encodeURIComponent(q)}`,
+    q => `https://api.binjie.fun/api/gpt?text=${encodeURIComponent(q)}`,
+    q => `https://gpt-api.pawan.krd/api/gpt?text=${encodeURIComponent(q)}`,
+    q => `https://chatgpt-api.shn.hk/v1/?msg=${encodeURIComponent(q)}`,
+    q => `https://gpt-app.fly.dev/api/gpt?prompt=${encodeURIComponent(q)}`,
+    q => `https://askgpt.vercel.app/api?query=${encodeURIComponent(q)}`,
+    q => `https://api.llama.fyi/api/text?text=${encodeURIComponent(q)}`,
+    q => `https://ai.ls/api?text=${encodeURIComponent(q)}`,
+    q => `https://chatfree.cloudflareapps.com/api?text=${encodeURIComponent(q)}`,
+    q => `https://api.itsrose.life/gpt4free?query=${encodeURIComponent(q)}`,
+    q => `https://gpt-cyber-api.vercel.app/api?q=${encodeURIComponent(q)}`,
+    q => `https://gptflask.openai-apis.workers.dev/api?q=${encodeURIComponent(q)}`,
+    q => `https://chatgpt-server.touhid.workers.dev/?text=${encodeURIComponent(q)}`,
+    q => `https://api.deepseek.one/freegpt?q=${encodeURIComponent(q)}`,
+    q => `https://api.lupin.chat/v1/chat?question=${encodeURIComponent(q)}`,
+    q => `https://chatforai.net/api?text=${encodeURIComponent(q)}`,
+    q => `https://proxygpt.vercel.app/api?prompt=${encodeURIComponent(q)}`,
+    q => `https://api.obabo.xyz/v1/chat?message=${encodeURIComponent(q)}`
   ];
 
-  let success = false;
   let respuestaFinal = '';
 
-  for (let i = 0; i < endpoints.length; i++) {
+  for (let i = 0; i < fuentes.length; i++) {
     try {
-      const url = endpoints[i](text);
-      const res = await fetch(url);
+      const res = await fetch(fuentes[i](text));
       const data = await res.json();
 
-      // Intenta detectar diferentes formatos de respuesta
-      const respuesta =
+      const reply =
         data.reply ||
+        data.response ||
+        data.result ||
+        data.message ||
         data.choices?.[0]?.message?.content ||
         data.choices?.[0]?.text ||
-        data.result ||
-        data.response ||
         (typeof data === 'string' ? data : null);
 
-      if (respuesta) {
-        respuestaFinal = `🤖 *Gura IA dice:*\n\n${respuesta.trim()}\n\n🌐 Fuente: IA #${i + 1}`;
-        success = true;
+      if (reply) {
+        respuestaFinal = `🧠 *Gura IA (Fuente #${i + 1}) responde:*\n\n${reply.trim()}\n\n🌊 _Rescatado del océano de IAs gratis_`;
         break;
       }
     } catch (e) {
-      console.log(`❌ Error con IA ${i + 1}:`, e.message);
+      console.log(`⚠️ Fuente ${i + 1} falló: ${e.message}`);
     }
   }
 
-  if (success) {
+  if (respuestaFinal) {
     await m.reply(respuestaFinal);
     await m.react('✅');
   } else {
-    await m.reply(`❌ Todas las IAs gratuitas fallaron.\nIntenta de nuevo más tarde o cambia la pregunta.`);
+    await m.reply('❌ Ninguna IA respondió correctamente. Intenta más tarde.');
     await m.react('❌');
   }
 };
 
-handler.help = ['multiia <pregunta>'];
+handler.help = ['multiia <texto>'];
 handler.tags = ['ia'];
-handler.command = ['multiia', 'ia10', 'iafree'];
+handler.command = ['multiia', 'ia20', 'guraia'];
 
 export default handler;
