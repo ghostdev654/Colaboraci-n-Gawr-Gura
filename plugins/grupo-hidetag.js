@@ -75,7 +75,7 @@ handler.help = ['hidetag']
 handler.tags = ['grupo']
 handler.command = ['hidetag', 'notificar', 'notify', 'tag']
 handler.group = true
-handler.admin = true
+handler.admin = false
 handler.register = false
 
 export default handler
