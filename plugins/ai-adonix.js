@@ -2,78 +2,50 @@ import fetch from 'node-fetch';
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
   if (!text) {
-    return m.reply(`🦈 *Gura IA* te espera para ayudarte~\n\n📌 Usa:\n${usedPrefix + command} [tu pregunta]\n\n💬 Ejemplo:\n${usedPrefix + command} haz un código JS que sume dos números`);
+    return m.reply(`🦈 *Gawr Gura IA está lista para ayudarte!* 🐬\n\n💬 Usa:\n${usedPrefix + command} [tu pregunta]\n📌 Ejemplo:\n${usedPrefix + command} ¿Quién es Gawr Gura?`);
   }
 
+  await m.react('🌊');
+
   try {
-    await m.react('💭');
-
-    const apiKey = '57211fe739784450b94b09a694e128a1';
-    const url = 'https://aimlapi.com/api/v1/aiml';
-
-    const res = await fetch(url, {
-      method: 'POST',
+    const response = await fetch("https://api.aimlapi.com/v1/chat/completions", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey
+        "Content-Type": "application/json",
+        "Authorization": "Bearer 57211fe739784450b94b09a694e128a1"
       },
       body: JSON.stringify({
-        prompt: text,
-        // Puedes personalizar más parámetros si la API los admite
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "user",
+            content: text
+          }
+        ]
       })
     });
 
-    const data = await res.json();
+    const data = await response.json();
 
-    // 💬 Texto de respuesta
-    if (data && data.response) {
-      const [mensaje, ...codigo] = data.response.split(/```(?:javascript|js|html)?/i);
-      let respuestaFinal = `🌊 *Gura IA responde:*\n\n${mensaje.trim()}`;
-
-      if (codigo.length > 0) {
-        respuestaFinal += `\n\n💻 *Código generado:*\n\`\`\`js\n${codigo.join('```').trim().slice(0, 3900)}\n\`\`\``;
-      }
-
-      await m.reply(respuestaFinal);
-      await m.react('✅');
-      return;
+    if (!data.choices || !data.choices.length) {
+      throw new Error("Sin respuesta válida de la IA");
     }
 
-    // 🎤 Si viniera audio generado (solo si la API lo soporta)
-    if (data.audio) {
-      await conn.sendMessage(m.chat, {
-        audio: { url: data.audio },
-        mimetype: 'audio/mpeg',
-        ptt: true,
-        fileName: `gura-ai.mp3`
-      }, { quoted: m });
-      await m.react('✅');
-      return;
-    }
+    let reply = data.choices[0].message.content;
+    let decorado = `🐟 *Gura dice:* 〰️\n\n${reply.trim()}\n\n🌊 _Modelo: GPT-4o_\n🪸 *aimlapi.com*`;
 
-    // 🖼️ Si viniera una imagen generada (si la API lo soporta)
-    if (data.image) {
-      await conn.sendMessage(m.chat, {
-        image: { url: data.image },
-        caption: `📷 *Imagen creada por Gura IA*\n\n🖌️ _${text}_`,
-      }, { quoted: m });
-      await m.react('✅');
-      return;
-    }
-
-    // ⚠️ Si no hubo respuesta válida
-    await m.react('❌');
-    return m.reply('❌ Gura-chan no pudo procesar esta pregunta, nyah~');
+    await m.reply(decorado);
+    await m.react('✅');
 
   } catch (e) {
-    console.error('[ERROR GURA IA]', e);
+    console.error('[❌ ERROR GURA IA]', e);
     await m.react('❌');
-    return m.reply(`⚠️ *Gura IA falló:* ${e.message}`);
+    m.reply(`⚠️ Ocurrió un error al consultar la IA.\n\n💢 *Detalles:* ${e.message}`);
   }
 };
 
-handler.help = ['adonix <pregunta>'];
+handler.help = ['guraia <pregunta>'];
 handler.tags = ['ia'];
-handler.command = ['adonix', 'ai', 'adonixia'];
+handler.command = ['guraia', 'gptgura', 'gpt4gura', 'ai'];
 
 export default handler;
