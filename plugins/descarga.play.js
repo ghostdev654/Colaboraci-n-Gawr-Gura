@@ -49,7 +49,7 @@ let ouh = await fetch(`https://fastrestapis.fasturl.cloud/downup/ytdown-v1?name=
 }
 
 handler.help = ['play'].map(v => v + ' <consulta>')
-handler.tags = ['downloader']
+handler.tags = ['Downloaders']
 handler.command = /^(play)$/i
 
 handler.register = false
