@@ -3,75 +3,82 @@ import fetch from 'node-fetch';
 
 const handler = async (m, { conn, args, usedPrefix, command }) => {
   const text = args.join(' ');
-  
+
   if (!text) {
-    return m.reply(`✧･ﾟ: *✧･ﾟ:* 🎨 *¡Escribe el texto para crear tu imagen brat buba~!*\n\n*Ejemplo:* ${usedPrefix}${command} Gawr Gura`);
+    return m.reply(`✧･ﾟ: *✧･ﾟ:* 🦈 *¡Hyaaa~! Dime algo para que pueda ser una brat contigo~!*\n\n*Ejemplo:* ${usedPrefix}${command} Explícame algo difícil`);
   }
 
   try {
-    await m.react('🎨');
+    await m.react('😤');
     
-    // API para generar imagen estilo brat
-    const apiUrl = `https://api.popcat.xyz/brat?text=${encodeURIComponent(text)}`;
+    const bratPrompt = `Responde como una "brat" anime kawaii, usando un tono presumido pero tierno. Usa expresiones como "hmph!", "baka", "no es que me importe o algo así...", y emojis kawaii. Tu personalidad es orgullosa pero adorable.`;
     
-    const response = await fetch(apiUrl);
-    
+    const response = await fetch('https://api.ryzendesu.vip/api/ai/gpt4', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        text: `${bratPrompt}\n\nUsuario: ${text}`,
+        system: "Eres una IA con personalidad brat kawaii"
+      })
+    });
+
     if (!response.ok) {
-      throw new Error('No se pudo generar la imagen brat');
+      // API de respaldo
+      const backupResponse = await fetch(`https://api.openai-sb.com/v1/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',
+          messages: [{
+            role: 'system',
+            content: bratPrompt
+          }, {
+            role: 'user',
+            content: text
+          }]
+        })
+      });
+      
+      if (!backupResponse.ok) throw new Error('Brat API failed');
+      
+      const backupData = await backupResponse.json();
+      var result = backupData.choices[0].message.content;
+    } else {
+      const data = await response.json();
+      var result = data.response || data.choices?.[0]?.message?.content;
     }
 
-    const buffer = await response.buffer();
+    if (!result) throw new Error('No response from Brat AI');
 
-    const bratMessage = `
-✧･ﾟ: *✧･ﾟ:* 🎨 *ʙʀᴀᴛ ɢᴇɴᴇʀᴀᴛᴏʀ* 🎨 :･ﾟ✧*:･ﾟ✧
+    const responseMsg = `
+✧･ﾟ: *✧･ﾟ:* 😤 *ʙʀᴀᴛ ᴀɪ* 😤 :･ﾟ✧*:･ﾟ✧
 
-📝 *Texto:* ${text}
-🦈 *Generado por:* @${m.sender.split('@')[0]}
+${result}
 
-꒰ 💚 *¡Tu imagen brat está lista buba~!* 💚 ꒱
+꒰ 💅 *Pregunta de:* @${m.sender.split('@')[0]} ꒱
 `;
 
     await conn.sendMessage(m.chat, {
-      image: buffer,
-      caption: bratMessage,
+      text: responseMsg,
       mentions: [m.sender]
     }, { quoted: m });
 
-    await m.react('✅');
+    await m.react('💅');
 
   } catch (error) {
-    console.error('Error generando imagen brat:', error);
-    
-    // Fallback con otra API
-    try {
-      const fallbackUrl = `https://api.memegen.link/images/custom/_/${encodeURIComponent(text)}.png?style=brat&background=lime&color=black`;
-      
-      await conn.sendMessage(m.chat, {
-        image: { url: fallbackUrl },
-        caption: `
-✧･ﾟ: *✧･ﾟ:* 🎨 *ʙʀᴀᴛ ɢᴇɴᴇʀᴀᴛᴏʀ* 🎨 :･ﾟ✧*:･ﾟ✧
-
-📝 *Texto:* ${text}
-🦈 *Generado por:* @${m.sender.split('@')[0]}
-
-꒰ 💚 *¡Tu imagen brat está lista buba~!* 💚 ꒱
-`,
-        mentions: [m.sender]
-      }, { quoted: m });
-      
-      await m.react('✅');
-      
-    } catch (fallbackError) {
-      console.error('Error con API fallback:', fallbackError);
-      await m.reply('❌ *¡Hyaaa~! No se pudo generar la imagen brat buba~*\n\n*Intenta de nuevo más tarde desu~*');
-      await m.react('❌');
-    }
+    console.error(error);
+    await m.reply(`❌ *¡Hmph! No es que quisiera responder de todas formas, baka~!*\n\n*Error:* ${error.message}`);
+    await m.react('❌');
   }
 };
 
 handler.help = ['brat'];
-handler.command = ['brat'];
-handler.tags = ['maker', 'tools'];
+handler.tags = ['ai'];
+handler.command = ['brat', 'bratai'];
 handler.register = false;
 
 export default handler;

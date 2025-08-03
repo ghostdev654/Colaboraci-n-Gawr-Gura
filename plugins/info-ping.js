@@ -1,3 +1,4 @@
+
 import fs from 'fs'
 import path from 'path'
 
@@ -12,7 +13,7 @@ const borders = [
 ]
 
 const handler = async (m, { conn }) => {
-  const start = Date.now()
+  const start = process.hrtime.bigint()
 
   // Obtener el número del bot actual (la sesión activa)
   const botActual = conn.user?.jid?.split('@')[0].replace(/\D/g, '')
@@ -29,17 +30,24 @@ const handler = async (m, { conn }) => {
     }
   }
 
-  const latency = Date.now() - start
+  const end = process.hrtime.bigint()
+  const latency = Number(end - start) / 1000000 // Convertir a milisegundos con decimales
 
   // Seleccionar un par de bordes aleatorio
   const randomBorder = borders[Math.floor(Math.random() * borders.length)]
+
+  // Determinar el estado de la conexión
+  let status = '🟢 Excelente'
+  if (latency > 100) status = '🟡 Bueno'
+  if (latency > 300) status = '🔴 Lento'
 
   // Crear el mensaje decorado
   const decoratedMessage = `
 ${randomBorder.top}
 │                                    │
-│   🌟 *Ping:* ${latency} ms                 │
-│   🌊 *Bot:* ${nombreBot} está aquí ~ 🦈     │
+│   ⚡ *Ping:* ${latency.toFixed(2)} ms           │
+│   📊 *Estado:* ${status}                 │
+│   🦈 *Bot:* ${nombreBot}        │
 │                                    │
 ${randomBorder.bottom}
 `
@@ -49,5 +57,5 @@ ${randomBorder.bottom}
   }, { quoted: m })
 }
 
-handler.command = ['p']
+handler.command = ['p', 'ping']
 export default handler

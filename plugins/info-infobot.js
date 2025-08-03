@@ -1,135 +1,79 @@
-
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import os from 'os';
-import fs from 'fs';
-
-const execAsync = promisify(exec);
+import fs from 'fs'
+import os from 'os'
 
 const handler = async (m, { conn }) => {
   try {
-    await m.react('📊');
+    // Información del sistema
+    const totalMem = (os.totalmem() / 1024 / 1024 / 1024).toFixed(2)
+    const freeMem = (os.freemem() / 1024 / 1024 / 1024).toFixed(2)
+    const usedMem = (totalMem - freeMem).toFixed(2)
+    const cpuUsage = os.loadavg()[0].toFixed(2)
+    const uptime = process.uptime()
 
-    // Obtener información del sistema
-    const uptime = process.uptime();
-    const totalMemory = os.totalmem();
-    const freeMemory = os.freemem();
-    const usedMemory = totalMemory - freeMemory;
-    const cpuUsage = os.loadavg()[0];
-    const platform = os.platform();
-    const arch = os.arch();
-    const nodeVersion = process.version;
+    // Estadísticas del bot
+    const totalChats = Object.keys(global.db.data.chats || {}).length
+    const totalUsers = Object.keys(global.db.data.users || {}).length
+    const totalPlugins = fs.readdirSync('./plugins').filter(file => file.endsWith('.js')).length
 
-    // Estadísticas de la base de datos
-    const stats = global.db.data.stats || {};
-    const users = Object.keys(global.db.data.users || {}).length;
-    const chats = Object.keys(global.db.data.chats || {}).length;
+    // Información de Node.js
+    const nodeVersion = process.version
+    const platform = os.platform()
+    const arch = os.arch()
 
-    // Contar comandos ejecutados
-    let totalCommands = 0;
-    let successCommands = 0;
-    for (const [plugin, data] of Object.entries(stats)) {
-      totalCommands += data.total || 0;
-      successCommands += data.success || 0;
-    }
+    // Runtime formateado
+    const days = Math.floor(uptime / 86400)
+    const hours = Math.floor((uptime % 86400) / 3600)
+    const minutes = Math.floor((uptime % 3600) / 60)
+    const seconds = Math.floor(uptime % 60)
 
-    // Plugins activos
-    const activePlugins = Object.keys(global.plugins || {}).length;
+    const runtimeStr = `${days}d ${hours}h ${minutes}m ${seconds}s`
 
-    // Sub-bots conectados
-    const subBots = global.conns ? global.conns.filter(conn => conn.user).length : 0;
+    // Porcentaje de memoria
+    const memPercent = ((usedMem / totalMem) * 100).toFixed(1)
 
-    // Formatear tiempo de actividad
-    const formatUptime = (seconds) => {
-      const days = Math.floor(seconds / 86400);
-      const hours = Math.floor((seconds % 86400) / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-      const secs = Math.floor(seconds % 60);
-      
-      return `${days}d ${hours}h ${minutes}m ${secs}s`;
-    };
+    const infoMsg = `
+╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+│                                                    │
+│  🦈 ••••••••••••••••••••••••••••••••••••••••••••• 🦈  │
+│             ✨ *INFORMACIÓN DEL BOT* ✨               │
+│  🦈 ••••••••••••••••••••••••••••••••••••••••••••• 🦈  │
+│                                                    │
+│  📊 *ESTADÍSTICAS EN TIEMPO REAL*                   │
+│  ├─ 👥 Chats Registrados: ${totalChats}                    │
+│  ├─ 👤 Usuarios Registrados: ${totalUsers}                 │
+│  ├─ 🔧 Plugins Cargados: ${totalPlugins}                   │
+│  └─ ⏰ Tiempo Activo: ${runtimeStr}                │
+│                                                    │
+│  💻 *INFORMACIÓN DEL SISTEMA*                       │
+│  ├─ 🖥️ Plataforma: ${platform} (${arch})              │
+│  ├─ 🟢 Node.js: ${nodeVersion}                         │
+│  ├─ 💾 RAM Total: ${totalMem} GB                       │
+│  ├─ 🔥 RAM Usada: ${usedMem} GB (${memPercent}%)           │
+│  ├─ 💚 RAM Libre: ${freeMem} GB                        │
+│  └─ ⚡ CPU Load: ${cpuUsage}%                          │
+│                                                    │
+│  🌊 *ESTADO DEL BOT*                                │
+│  ├─ 🟢 Estado: Online                               │
+│  ├─ 🔋 Performance: ${memPercent < 80 ? 'Óptimo' : 'Alto uso'}             │
+│  ├─ 📡 Conexión: Estable                           │
+│  └─ 🦈 Versión: Gawr Gura Bot v2.0                 │
+│                                                    │
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
 
-    // Formatear bytes
-    const formatBytes = (bytes) => {
-      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-      if (bytes === 0) return '0 Bytes';
-      const i = Math.floor(Math.log(bytes) / Math.log(1024));
-      return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
-    };
+꒰ 💙 *Información actualizada en tiempo real buba~* 💙 ꒱
+`
 
-    // Obtener información del bot actual
-    const botNumber = conn.user?.jid?.split('@')[0] || 'Unknown';
-    const botName = global.namebot || '🌊🦈 𝙂𝘼𝙒𝙍 𝙂𝙐𝙍𝘼 🦈🌊';
-
-    // Top 5 comandos más usados
-    const topCommands = Object.entries(stats)
-      .sort((a, b) => (b[1].total || 0) - (a[1].total || 0))
-      .slice(0, 5)
-      .map(([plugin, data], index) => {
-        const name = plugin.replace(/\.js$/, '').replace(/^[^-]+-/, '');
-        return `${index + 1}. ${name}: ${data.total || 0} usos`;
-      })
-      .join('\n   ');
-
-    const infoMessage = `
-╭───────────────༺☆༻───────────────╮
-🌊🦈 *Gawr Gura's Bot Statistics* 🦈🌊
-╰───────────────༺☆༻───────────────╯
-
-╭─❍ 📊 *Estadísticas Generales:*
-│ 🤖 *Bot:* ${botName}
-│ 📱 *Número:* +${botNumber}
-│ ⏰ *Tiempo Activa:* ${formatUptime(uptime)}
-│ 👥 *Usuarios:* ${users}
-│ 💬 *Chats:* ${chats}
-│ 🔌 *Plugins:* ${activePlugins}
-│ 🦈 *Sub-bots:* ${subBots}
-╰───────────────────────────────╯
-
-╭─❍ 📈 *Comandos Ejecutados:*
-│ 📋 *Total:* ${totalCommands}
-│ ✅ *Exitosos:* ${successCommands}
-│ ❌ *Fallidos:* ${totalCommands - successCommands}
-│ 📊 *Tasa éxito:* ${totalCommands > 0 ? Math.round((successCommands / totalCommands) * 100) : 0}%
-╰───────────────────────────────╯
-
-╭─❍ 🏆 *Top Comandos:*
-   ${topCommands || 'Sin datos disponibles'}
-╰───────────────────────────────╯
-
-╭─❍ 💻 *Sistema:*
-│ 🖥️ *Plataforma:* ${platform} (${arch})
-│ 🟢 *Node.js:* ${nodeVersion}
-│ 🧠 *Memoria:* ${formatBytes(usedMemory)} / ${formatBytes(totalMemory)}
-│ 📊 *Uso RAM:* ${Math.round((usedMemory / totalMemory) * 100)}%
-│ ⚡ *CPU Load:* ${Math.round(cpuUsage * 100)}%
-╰───────────────────────────────╯
-
-╭─❍ 🦈 *Estado del Bot:*
-│ 🟢 *Estado:* Online y funcionando
-│ 🔄 *Última actualización:* ${new Date().toLocaleString('es-MX')}
-│ 💙 *Desarrollado con:* Node.js & Baileys
-╰───────────────────────────────╯
-
-꒰ 💫 *¡Gawr Gura siempre lista para ayudar buba~!* 💫 ꒱
-`;
-
-    await conn.sendMessage(m.chat, {
-      text: infoMessage
-    }, { quoted: m });
-
-    await m.react('📈');
+    await conn.sendMessage(m.chat, { text: infoMsg }, { quoted: m })
+    await m.react('📊')
 
   } catch (error) {
-    console.error('Error obteniendo estadísticas:', error);
-    await m.reply('❌ *¡Hyaaa~! No se pudieron obtener las estadísticas buba~*');
-    await m.react('❌');
+    console.error(error)
+    await m.reply('❌ *¡Hyaaa~! Error al obtener información del bot buba~*')
   }
-};
+}
 
-handler.help = ['infobot', 'stats', 'estadisticas'];
-handler.command = ['infobot', 'stats', 'estadisticas', 'info'];
-handler.tags = ['info'];
-handler.register = false;
+handler.help = ['infobot', 'stats']
+handler.tags = ['info']
+handler.command = ['infobot', 'stats', 'status', 'estadisticas']
 
-export default handler;
+export default handler

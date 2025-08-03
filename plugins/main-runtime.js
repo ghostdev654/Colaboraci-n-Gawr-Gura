@@ -1,19 +1,31 @@
-let handler = async (m, { conn, args, usedPrefix, command }) => {
 
-        let _muptime
-    if (process.send) {
-      process.send('uptime')
-      _muptime = await new Promise(resolve => {
-        process.once('message', resolve)
-        setTimeout(resolve, 1000)
-      }) * 1000
-    }
-    let muptime = clockString(_muptime)
-   m.reply(`*» Bot activo durante* : ${muptime}`) 
+let handler = async (m, { conn, args, usedPrefix, command }) => {
+  let _muptime
+  if (process.send) {
+    process.send('uptime')
+    _muptime = await new Promise(resolve => {
+      process.once('message', resolve)
+      setTimeout(resolve, 1000)
+    }) * 1000
+  }
+  let muptime = clockString(_muptime)
+  
+  const runtimeMsg = `
+✧･ﾟ: *✧･ﾟ:* ⏰ *ʀᴜɴᴛɪᴍᴇ* ⏰ :･ﾟ✧*:･ﾟ✧
+
+🦈 *Bot activo durante:* ${muptime}
+
+꒰ 💙 *¡Funcionando perfectamente buba~!* 💙 ꒱
+`
+  
+  await conn.reply(m.chat, runtimeMsg, m, rcanal)
+  await m.react('⏰')
 }
+
 handler.help = ['runtime']
 handler.tags = ['main']
 handler.command = ['runtime', 'uptime']
+
 export default handler
 
 function clockString(ms) {
