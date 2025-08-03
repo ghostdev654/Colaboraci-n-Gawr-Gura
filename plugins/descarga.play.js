@@ -53,6 +53,6 @@ handler.tags = ['Downloaders']
 handler.command = /^(play)$/i
 
 handler.register = false
-handler.disable = false
+handler.disable = true
 
 export default handler
