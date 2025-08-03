@@ -1,4 +1,4 @@
-https://7c9b8b21-d188-4214-8657-36cfb450d9ac-00-1e43pyjz4rbrv.picard.replit.dev
+
 <p align="center">
   <img src="https://files.catbox.moe/8sl0sc.jpg" width="320" alt="Ultimate Shark Bot">
 </p>
