@@ -4,8 +4,8 @@ import { fileURLToPath } from 'url'
 
 
 global.owner = [
+  ['5491151545427', '｢Owner｣メ Ġᶏmԑя', true],
   ['573133374132', '💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖 ', true],
-  ['50493732693', 'Ado', true],
 ]
 
 
@@ -26,12 +26,12 @@ global.namebot = 'Gawr Gura'
 global.author = '💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖 '
 
 
-global.namecanal = 'Gawr Gura'
-global.canal = 'https://whatsapp.com/channel/0029VbAmMiM96H4KgBHZUn1z'
-global.idcanal = '120363399729727124@newsletter'
+global.namecanal = ''
+global.canal = ''
+global.idcanal = ''
 
 global.ch = {
-ch1: '120363399729727124@newsletter',
+ch1: '',
 }
 
 global.multiplier = 69 
