@@ -1,95 +1,147 @@
-import axios from 'axios';
 import fetch from 'node-fetch';
 
-const handler = async (msg, { conn, args, usedPrefix, command }) => {
+const handler = async (m, { conn, args, usedPrefix, command }) => {
   const text = args.join(' ');
-  const chatId = msg.key.remoteJid;
 
   if (!text) {
-    return conn.sendMessage(chatId, {
-      text: `Habla con el pndj de xex`
-    }, { quoted: msg });
+    return m.reply(`✧･ﾟ: *✧･ﾟ:* 🦈 *¡Hyaaa~! Escribe algo para que pueda ayudarte buba~!*\n\n*Ejemplo:* ${usedPrefix}${command} ¿Cómo hacer sushi?`);
   }
 
   try {
-    await conn.sendMessage(chatId, { react: { text: '🕳️', key: msg.key } });
-
-    const name = msg.pushName || 'Usuario';
-    const prompt = await getPrompt();
+    await m.react('🤖');
+    
+    const name = m.pushName || 'Usuario';
     let result = '';
 
+    // Intentar con diferentes APIs gratuitas
     try {
-      result = await luminaiQuery(text, name, prompt);
-      result = cleanResponse(result);
+      result = await chatWithBlackbox(text, name);
     } catch (e) {
-      console.error('Error Luminai:', e);
+      console.error('Error Blackbox:', e);
       try {
-        result = await perplexityQuery(text, prompt);
+        result = await chatWithOpenAI(text);
       } catch (e) {
-        console.error('Error Perplexity:', e);
-        throw new Error('No se obtuvo respuesta de los servicios');
+        console.error('Error OpenAI fallback:', e);
+        try {
+          result = await chatWithSimpleAPI(text);
+        } catch (e) {
+          console.error('Error Simple API:', e);
+          throw new Error('No se pudo obtener respuesta de ningún servicio');
+        }
       }
     }
 
-    const responseMsg = `${result}`;
+    const responseMsg = `
+✧･ﾟ: *✧･ﾟ:* 🦈 *ɢᴀᴡʀ ɢᴜʀᴀ ᴀɪ* 🦈 :･ﾟ✧*:･ﾟ✧
 
-    await conn.sendMessage(chatId, {
-      text: responseMsg
-    }, { quoted: msg });
+${result}
 
-    await conn.sendMessage(chatId, { react: { text: '😂', key: msg.key } });
+꒰ 💙 *Pregunta de:* @${m.sender.split('@')[0]} ꒱
+`;
+
+    await conn.sendMessage(m.chat, {
+      text: responseMsg,
+      mentions: [m.sender]
+    }, { quoted: m });
+
+    await m.react('🦈');
 
   } catch (error) {
     console.error(error);
-    await conn.sendMessage(chatId, {
-      text: `❌ Error: ${error.message}`
-    }, { quoted: msg });
-
-    await conn.sendMessage(chatId, { react: { text: '❌', key: msg.key } });
+    await m.reply(`❌ *¡Hyaaa~! Algo salió mal buba~*\n\n*Error:* ${error.message}`);
+    await m.react('❌');
   }
 };
 
-async function getPrompt() {
-  try {
-    const res = await fetch('https://raw.githubusercontent.com/elrebelde21/LoliBot-MD/main/src/text-chatgpt.txt');
-    return await res.text();
-  } catch {
-    return 'Eres un asistente inteligente';
-  }
+async function chatWithBlackbox(text, user) {
+  const response = await fetch('https://www.blackbox.ai/api/chat', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    },
+    body: JSON.stringify({
+      messages: [{
+        id: Date.now(),
+        content: text,
+        role: 'user'
+      }],
+      id: Date.now(),
+      previewToken: null,
+      userId: user,
+      codeModelMode: true,
+      agentMode: {},
+      trendingAgentMode: {},
+      isMicMode: false,
+      maxTokens: 1024,
+      isChromeExt: false,
+      githubToken: null
+    })
+  });
+
+  if (!response.ok) throw new Error('Blackbox API failed');
+  
+  const data = await response.text();
+  return cleanResponse(data);
+}
+
+async function chatWithOpenAI(text) {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'gpt-3.5-turbo',
+      messages: [{
+        role: 'user',
+        content: text
+      }],
+      max_tokens: 1000,
+      temperature: 0.7
+    })
+  });
+
+  if (!response.ok) throw new Error('OpenAI API failed');
+  
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+async function chatWithSimpleAPI(text) {
+  const response = await fetch(`https://api.openai-sb.com/v1/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'gpt-3.5-turbo',
+      messages: [{
+        role: 'user',
+        content: text
+      }]
+    })
+  });
+
+  if (!response.ok) throw new Error('Simple API failed');
+  
+  const data = await response.json();
+  return data.choices[0].message.content;
 }
 
 function cleanResponse(text) {
-  if (!text) return '';
+  if (!text) return 'No se pudo obtener respuesta';
   return text
-    .replace(/Maaf, terjadi kesalahan saat memproses permintaan Anda/g, '')
-    .replace(/Generated by BLACKBOX\.AI.*?https:\/\/www\.blackbox\.ai/g, '')
-    .replace(/and for API requests replace https:\/\/www\.blackbox\.ai with https:\/\/api\.blackbox\.ai/g, '')
+    .replace(/(\$@\$v=undefined-rv1\$@\$|\$@\$v=v1\.15-rv2\$@\$)/g, '')
+    .replace(/Generated by BLACKBOX\.AI.*?https:\/\/www\.blackbox\.ai/gi, '')
+    .replace(/and for API requests replace.*?https:\/\/api\.blackbox\.ai/gi, '')
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
 
-async function luminaiQuery(q, user, prompt) {
-  const { data } = await axios.post('https://luminai.my.id', {
-    content: q,
-    user: user,
-    prompt: prompt,
-    webSearchMode: true
-  });
-  return data.result;
-}
-
-async function perplexityQuery(q, prompt) {
-  const { data } = await axios.get('https://api.perplexity.ai/chat', {
-    params: {
-      query: q,
-      context: prompt
-    }
-  });
-  return data.response;
-}
-
-handler.help = ['ask'];
-handler.command = ['ask'];
+handler.help = ['ask', 'ia', 'chat'];
+handler.command = ['ask', 'ia', 'chat', 'gpt'];
 handler.tags = ['ai'];
-handler.register = false
+handler.register = false;
 
 export default handler;
