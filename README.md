@@ -230,7 +230,7 @@ Este proyecto está bajo la Licencia MIT - mira el archivo [LICENSE](LICENSE) pa
 
 ---
 
-### 🦈 Hecho con 💙 por fans de Gawr Gura
+### 🦈 Hecho por Yo Soy Yo
 
 <img src="https://i.imgur.com/rKVlUIL.gif" alt="Gawr Gura Wave" width="200"/>
 
