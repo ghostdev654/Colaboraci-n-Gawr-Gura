@@ -58,6 +58,33 @@ handler.before = async (m, { conn }) => {
   if (!global.db.data.chats[m.chat]) global.db.data.chats[m.chat] = {}
   const chat = global.db.data.chats[m.chat]
 
+  // Bienvenida temporal
+  if (chat.tempWelcome && m.messageStubType === 27) {
+    const newJid = m.messageStubParameters?.[0]
+    if (!newJid) return
+
+    // Verificar si aún está en tiempo
+    if (chat.tempWelcomeTime && Date.now() > chat.tempWelcomeTime) {
+      chat.tempWelcome = false
+      chat.tempWelcomeMsg = ''
+      chat.tempWelcomeTime = 0
+    } else if (chat.tempWelcomeMsg) {
+      const welcomeMsg = `
+✧･ﾟ: ✧･ﾟ: *「 🌊 ʙɪᴇɴᴠᴇɴɪᴅᴀ 🌊 」* :･ﾟ✧ :･ﾟ✧
+
+🦈 *¡Hola @${newJid.split('@')[0]} buba~!*
+
+${chat.tempWelcomeMsg}
+
+꒰ 💙 *¡Disfruta tu estadía en el grupo desu~!* 💙 ꒱
+`
+      await conn.sendMessage(m.chat, {
+        text: welcomeMsg,
+        mentions: [newJid]
+      })
+    }
+  }
+
   // Antiárabe
   if (chat.antiarabe && m.messageStubType === 27) {
     const newJid = m.messageStubParameters?.[0]
