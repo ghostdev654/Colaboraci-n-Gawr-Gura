@@ -4,8 +4,8 @@ import yts from 'yt-search';
 
 // 🔹 Lista de 10 API keys gratuitas (puedes agregar más)
 const API_KEYS = [
-  'AIzaSyA1-PRUEBA1',
-  'AIzaSyA2-PRUEBA2',
+  'https://delirius-apiofc.vercel.app/download/ytmp3?url=https://youtu.be/TdrL3QxjyVw',
+  'https://delirius-apiofc.vercel.app/download/ytmp3?url=https://youtu.be/TdrL3QxjyVw',
   'AIzaSyA3-PRUEBA3',
   'AIzaSyA4-PRUEBA4',
   'AIzaSyA5-PRUEBA5',
