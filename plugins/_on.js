@@ -70,14 +70,10 @@ handler.before = async (m, { conn }) => {
       chat.tempWelcomeTime = 0
     } else if (chat.tempWelcomeMsg) {
       const welcomeMsg = `
-✧･ﾟ: ✧･ﾟ: *「 🌊 ʙɪᴇɴᴠᴇɴɪᴅᴀ 🌊 」* :･ﾟ✧ :･ﾟ✧
 
-🦈 *¡Hola @${newJid.split('@')[0]} buba~!*
+👋 *¡Hola @${newJid.split('@')[0]}!*
 
-${chat.tempWelcomeMsg}
-
-꒰ 💙 *¡Disfruta tu estadía en el grupo desu~!* 💙 ꒱
-`
+${chat.tempWelcomeMsg}`
       await conn.sendMessage(m.chat, {
         text: welcomeMsg,
         mentions: [newJid]
@@ -95,7 +91,7 @@ ${chat.tempWelcomeMsg}
     const isArab = arabicPrefixes.some(prefix => number.startsWith(prefix))
 
     if (isArab) {
-      await conn.sendMessage(m.chat, { text: `🦈 *Mm buba~... ${newJid} tiene un número sospechoso. ¡Sayonara! (Antiárabe activado).*` })
+      await conn.sendMessage(m.chat, { text: `⚠️ *El usuario* {newJid} *tiene un número sospechoso y será eliminado.*` })
       await conn.groupParticipantsUpdate(m.chat, [newJid], 'remove')
       return true
     }
