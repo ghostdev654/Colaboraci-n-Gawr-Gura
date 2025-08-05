@@ -7,7 +7,7 @@ var handler = async (m, { conn }) => {
     if (!match) return;
 
     const url = match[0];
-    const emoji = '🌸'; // Puedes personalizar esto
+    const emoji = '⏳'; // Puedes personalizar esto
 
     try {
         await conn.reply(m.chat, `${emoji} Espere un momento, estoy descargando su video...`, m);
@@ -21,7 +21,7 @@ var handler = async (m, { conn }) => {
         const videoURL = tiktokData.data.play;
 
         if (videoURL) {
-            await conn.sendFile(m.chat, videoURL, "tiktok.mp4", `${emoji} Aquí tienes ฅ^•ﻌ•^ฅ`, m);
+            await conn.sendFile(m.chat, videoURL, "tiktok.mp4", `✅ *Aquí tienes tu Video.*`, m);
         } else {
             return conn.reply(m.chat, "No se pudo descargar.", m);
         }
