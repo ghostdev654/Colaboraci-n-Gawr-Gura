@@ -318,16 +318,16 @@ export async function handler(chatUpdate) {
 
 global.dfail = (type, m, conn, usedPrefix) => {
     const mensajes = {
-        rowner: '🔐 Solo el *Creador* de la Bot puede usar este comando.',
-        owner: '👑 Solo el *Creador* y *Sub Bots* pueden usar este comando.',
+        rowner: '❌ *𝚂𝚘𝚕𝚘 𝚎𝚕 𝙾𝚠𝚗𝚎𝚛 𝚍𝚎𝚕 𝚋𝚘𝚝 𝚙𝚞𝚎𝚍𝚎 𝚞𝚝𝚒𝚕𝚒𝚣𝚊𝚛 𝚎𝚜𝚝𝚎 𝚌𝚘𝚖𝚊𝚗𝚍𝚘.*',
+        owner: '❌ *𝚂𝚘𝚕𝚘 𝚎𝚕 𝚙𝚛𝚘𝚙𝚒𝚎𝚝𝚊𝚛𝚒𝚘 𝚍𝚎𝚕 𝚂𝚞𝚋-𝙱𝚘𝚝 𝚙𝚞𝚎𝚍𝚎 𝚞𝚝𝚒𝚕𝚒𝚣𝚊𝚛 𝚎𝚜𝚝𝚎 𝚌𝚘𝚖𝚊𝚗𝚍𝚘.*',
         mods: '🛡️ Solo los *Moderadores* pueden usar este comando.',
         premium: '💎 Solo usuarios *Premium* pueden usar este comando.',
-        group: '👥 Este comando es solo para *Grupos*.',
+        group: '❌ *𝙴𝚜𝚝𝚎 𝚌𝚘𝚖𝚊𝚗𝚍𝚘 𝚜𝚘𝚕𝚘 𝚙𝚞𝚎𝚍𝚎 𝚞𝚜𝚊𝚛𝚜𝚎 𝚎𝚗 𝚐𝚛𝚞𝚙𝚘𝚜.*',
         private: '🔒 Solo en Chat *Privado* puedes usar este comando.',
-        admin: '⚔️ Solo los *Admins* del Grupo pueden usar este comando.',
-        botAdmin: '🤖 La Bot debe ser *Admin* para ejecutar esto.',
+        admin: '❌ *𝙴𝚜𝚝𝚎 𝚌𝚘𝚖𝚊𝚗𝚍𝚘 𝚜𝚘𝚕𝚘 𝚙𝚞𝚎𝚍𝚎 𝚜𝚎𝚛 𝚞𝚝𝚒𝚕𝚒𝚣𝚊𝚍𝚘 𝚙𝚘𝚛 𝙰𝚍𝚖𝚒𝚗𝚜.*',
+        botAdmin: '❌ *𝙿𝚊𝚛𝚊 𝚎𝚓𝚎𝚌𝚞𝚝𝚊𝚛 𝚎𝚜𝚝𝚎 𝚌𝚘𝚖𝚊𝚗𝚍𝚘, 𝚎𝚜 𝚗𝚎𝚌𝚎𝚜𝚊𝚛𝚒𝚘 𝚚𝚞𝚎 𝚜𝚎𝚊 𝙰𝚍𝚖𝚒𝚗.*',
         unreg: '📝 Debes estar *Registrado* para usar este comando.',
-        restrict: '⛔ Esta función está *deshabilitada*.'
+        restrict: '❌ 𝙴𝚜𝚝𝚎 𝚌𝚘𝚖𝚊𝚗𝚍𝚘 𝚎𝚜𝚝á 𝚍𝚎𝚜𝚑𝚊𝚋𝚒𝚕𝚒𝚝𝚊𝚍𝚘.'
     }
 
     const msg = mensajes[type]
