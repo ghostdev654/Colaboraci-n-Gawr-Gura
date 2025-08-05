@@ -26,24 +26,24 @@ const handler = async (m, { conn, command, args, isAdmin, isOwner }) => {
   const enable = command === 'on'
 
   if (!['antilink', 'welcome', 'antiarabe'].includes(type)) {
-    return m.reply(`🦈 *¿Eh? Usa el comando buba~:*\n\n*.on antilink* / *.off antilink*\n*.on welcome* / *.off welcome*\n*.on antiarabe* / *.off antiarabe*`)
+    return m.reply(`*_🔧 Usa correctamente:_*\n\n\n*_🟢 ON_*\n_.on antilink_\n_.on welcome_\n_.on antiarabe_\n\n\n*_🔴 OFF_*\n_.off antilink_\n_.off welcome_\n_.off antiarabe_`)
   }
 
-  if (!(isAdmin || isOwner)) return m.reply('❌ *¡Hyaaa~! Solo los admins pueden activar o desactivar funciones desu~!*')
+  if (!(isAdmin || isOwner)) return m.reply('❌ *𝙴𝚜𝚝𝚎 𝚌𝚘𝚖𝚊𝚗𝚍𝚘 𝚜𝚘𝚕𝚘 𝚙𝚞𝚎𝚍𝚎 𝚜𝚎𝚛 𝚞𝚝𝚒𝚕𝚒𝚣𝚊𝚍𝚘 𝚙𝚘𝚛 𝙰𝚍𝚖𝚒𝚗𝚜.*')
 
   if (type === 'antilink') {
     chat.antilink = enable
-    return m.reply(`✨ *Antilink ${enable ? 'activado' : 'desactivado'} buba~!*`)
+    return m.reply(`✅ *Antilink ${enable ? 'activado' : 'desactivado'}*`)
   }
 
   if (type === 'welcome') {
     chat.welcome = enable
-    return m.reply(`✨ *Welcome ${enable ? 'activado' : 'desactivado'} desu~!*`)
+    return m.reply(`✅ *Welcome ${enable ? 'activado' : 'desactivado'}*`)
   }
 
   if (type === 'antiarabe') {
     chat.antiarabe = enable
-    return m.reply(`✨ *Antiárabe ${enable ? 'activado' : 'desactivado'} uwu~!*`)
+    return m.reply(`✅ *Antiárabe ${enable ? 'activado' : 'desactivado'}*`)
   }
 }
 
@@ -119,7 +119,7 @@ ${chat.tempWelcomeMsg}
 
       try {
         await conn.sendMessage(m.chat, {
-          text: `🌊 *Hey buba~ ${userTag}, ¡no se permiten links aquí desu~!*`,
+          text: `⚠️ *Hey ${userTag}!* No se permiten enlaces de otros grupos.`,
           mentions: [m.sender]
         }, { quoted: m })
 
@@ -135,7 +135,7 @@ ${chat.tempWelcomeMsg}
         await conn.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
       } catch {
         await conn.sendMessage(m.chat, {
-          text: `⚠️ *¡Hyaaa~! No pude eliminar ni expulsar a ${userTag}. ¿Me falta un permiso, buba~?*`,
+          text: `⚠️ *Eror al expulsar a:* ${userTag}. El bot no es Admin.`,
           mentions: [m.sender]
         }, { quoted: m })
       }
@@ -158,12 +158,9 @@ ${chat.tempWelcomeMsg}
     }
 
     if (m.messageStubType === 27) {
-      const txtWelcome = '🦈 *¡Bienvenid@ buba~!* 🦈'
+      const txtWelcome = '👋 *¡Bienvenid@!'
       const bienvenida = `
-🌊 *Hiii~ ${userMention} buba~*
-✨ *Este grupo es increíble, espero te diviertas desu~!* 🦈💕
-
-`.trim()
+👋 *Welcome ${userMention}*\n✨ *Bienvenid@ al grupo!*`.trim()
 
       await conn.sendMessage(m.chat, {
         image: { url: profilePic },
@@ -173,11 +170,10 @@ ${chat.tempWelcomeMsg}
     }
 
     if (m.messageStubType === 28 || m.messageStubType === 32) {
-      const txtBye = '🌊 *¡Adiós buba~!* 🦈'
+      const txtBye = '👋 *¡Adiós!'
       const despedida = `
-💔 *Oh no~ ${userMention} nos está dejando desu~... ¡Qué triste!* 😢
-✨ *Ahora somos ${groupSize} tiburones buba~.* 🦈🌊
-`.trim()
+👋 *Adiós ${userMention}*, esperamos que vuelvas pronto…
+✳️ *Ahora somos ${groupSize} miembros.*`.trim()
 
       await conn.sendMessage(m.chat, {
         image: { url: byeImage },
