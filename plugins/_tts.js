@@ -17,14 +17,15 @@ let handler = async (m, { conn, args, command }) => {
   ]
 
   if (args.length < 2) {
-    return m.reply(`🦈 *Uso correcto, buba~:*\n.${command} <voz> <texto>\n\n🌊 *Voces disponibles:*\n${vocesDisponibles.join(', ')}`)
+    return m.reply(`*✳️ Uso correcto:*\n\n.${command} <voz> <texto>\n\n🗣️ *Voces disponibles:*
+> ${vocesDisponibles.join(', ')}`)
   }
 
   const voiceModel = args[0].toLowerCase()
   const text = args.slice(1).join(' ')
 
   if (!vocesDisponibles.includes(voiceModel)) {
-    return m.reply(`💢 *¡Eh?! Voz "${voiceModel}" no encontrada desu~...*\n🌊 *Voces disponibles:*\n${vocesDisponibles.join(', ')}`)
+    return m.reply(`❌ *Voz* "_${voiceModel}_" *no encontrada.*\n\n🗣️ *Voces disponibles:*\n> ${vocesDisponibles.join(', ')}`)
   }
 
   // Lista de APIs (principal y de respaldo)
@@ -60,7 +61,7 @@ let handler = async (m, { conn, args, command }) => {
   }
 
   if (!audioUrl) {
-    return m.reply('💦 *Awww~ Todas las APIs fallaron desu~... ¡Inténtalo más tarde, buba!*')
+    return m.reply('❌ *Error:* All APIs failed.\n> Intenta más tarde.')
   }
 
   try {
@@ -75,7 +76,7 @@ let handler = async (m, { conn, args, command }) => {
 
   } catch (e) {
     console.error(e)
-    m.reply('💢 *¡Gyaa~! Algo salió mal al enviar el audio desu~... inténtalo otra vez, uwu!*')
+    m.reply('❌ *Ocurrió un error al enviar el audio*\n> Intenta más tarde.')
   }
 }
 
