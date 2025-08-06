@@ -16,13 +16,13 @@ global.libreria = 'Baileys'
 global.baileys = 'V 6.7.16' 
 global.vs = '2.2.0'
 global.nameqr = 'YuriBotMD'
-global.namebot ='Gawr Gura'
+global.namebot = 'Tech-Bot V1'
 global.sessions = 'Sessions'
 global.jadi = 'JadiBots' 
 global.yukiJadibts = true
 
-global.packname = 'Gawr Gura'
-global.namebot = 'Gawr Gura'
+global.packname = 'Tech-Bot V1'
+global.namebot = 'Tech-Bot V1'
 global.author = '💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖 '
 
 
