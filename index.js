@@ -16,7 +16,7 @@ cfonts.say('gwara\ngura', {
   gradient: ['cyan', 'blue']
 })
 
-cfonts.say('VENGO DE ATLANTIS PA TU CASA', {
+cfonts.say('TECH-BOT V1', {
   font: 'simple',
   align: 'center',
   gradient: ['blue', 'white']
