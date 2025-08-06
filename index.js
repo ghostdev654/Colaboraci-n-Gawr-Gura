@@ -10,7 +10,7 @@ import cfonts from 'cfonts'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const require = createRequire(__dirname)
 
-cfonts.say('gwara\ngura', {
+cfonts.say('TECH-BOT V1', {
   font: 'block',
   align: 'center',
   gradient: ['cyan', 'blue']
