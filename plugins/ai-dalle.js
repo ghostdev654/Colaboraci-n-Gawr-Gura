@@ -2,7 +2,7 @@ import fetch from 'node-fetch'
 
 let handler = async (m, { conn, args, usedPrefix, command }) => {
   const prompt = args.join(' ')
-  if (!prompt) return m.reply(`✦ Usa el comando así:\n${usedPrefix + command} <texto para la imagen>\n\nEjemplo:\n${usedPrefix + command} gato kawaii con fondo rosa`)
+  if (!prompt) return m.reply(`⚠️ *_USO CORRECTO:_* :\n${usedPrefix + command} <texto para la imagen>\n\nEjemplo:\n${usedPrefix + command} Auto Deportivo GT3`)
 
   try {
     m.react('🕒')
