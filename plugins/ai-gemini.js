@@ -5,7 +5,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
   const text = args.join(' ');
 
   if (!text) {
-    return m.reply(`✧･ﾟ: *✧･ﾟ:* 🦈 *¡Hyaaa~! Escribe algo para que Gemini pueda ayudarte buba~!*\n\n*Ejemplo:* ${usedPrefix}${command} ¿Cómo hacer takoyaki?`);
+    return m.reply(`⚠️ *Escribe algo para preguntarle a Gemini*\n\n > *Ej:* ${usedPrefix}${command} ¿Cómo hacer takoyaki?`);
   }
 
   try {
@@ -31,11 +31,9 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     if (!data.response) throw new Error('No response from Gemini');
 
     const responseMsg = `
-✧･ﾟ: *✧･ﾟ:* 💎 *ɢᴇᴍɪɴɪ ᴀɪ* 💎 :･ﾟ✧*:･ﾟ✧
-
 ${data.response}
 
-꒰ 🌟 *Pregunta de:* @${m.sender.split('@')[0]} ꒱
+*Pregunta de:* @${m.sender.split('@')[0]}
 `;
 
     await conn.sendMessage(m.chat, {
@@ -47,7 +45,7 @@ ${data.response}
 
   } catch (error) {
     console.error(error);
-    await m.reply(`❌ *¡Hyaaa~! Gemini no pudo responder buba~*\n\n*Error:* ${error.message}`);
+    await m.reply(`❌ *ERROR:* the API falied.\n\n*Error:* ${error.message}`);
     await m.react('❌');
   }
 };
