@@ -1,7 +1,7 @@
 {
-  "name": "YuruYuri-MD",
+  "name": "Tech-Bot_V1",
   "version": "1.0.0",
-  "description": "Yuru Yuri Multi Device",
+  "description": "Tech-Bot V1 Wa-Bot",
   "main": "index.js",
   "type": "module",
   "directories": {
