@@ -13,23 +13,23 @@ const decorations = [
 
 // Decoraciones dinámicas para textos internos
 const textStyles = [
-  { greeting: 'ʜᴇʏ~ 🦈', activity: '✨ Actitud increíble', dateText: '🌊 Fecha hoy' },
-  { greeting: 'ʜʏᴇᴇ~ 🌊', activity: '🌟 Potencia activa', dateText: '🐚 Día actual' },
-  { greeting: 'ʜᴏʟᴀ~ 🐟', activity: '🐬 Gran energía', dateText: '💙 Momento presente' },
-  { greeting: 'ʙᴜʙᴀ~ 💙', activity: '☁️ Brilla fuerte', dateText: '✨ Fecha exacta' },
-  { greeting: 'ᴛʜᴇᴘᴏᴡᴇʀ~ 🌟', activity: '🌊 Fluidez total', dateText: '🦈 Tiempo actual' },
-]
+  { greeting: '𝐓𝐢𝐩𝐨:', activity: '🚀 Uptime:', dateText: '📆 Fecha Actual:' },
+  { greeting: '𝐓𝐢𝐩𝐨:', activity: '🚀 Uptime:', dateText: '📆 Fecha Actual:' },
+  { greeting: '𝐓𝐢𝐩𝐨:', activity: '🚀 Uptime:', dateText: '📆 Fecha Actual:' },
+  { greeting: '𝐓𝐢𝐩𝐨:', activity: '🚀 Uptime:', dateText: '📆 Fecha Actual:' },
+  { greeting: '𝐓𝐢𝐩𝐨:', activity: '🚀 Uptime:', dateText: '📆 Fecha Actual:' }
+];
 
 const tags = {
-  serbot: '✦ Subs Bot',
-  downloader: '✦ Downloaders',
-  tools: '✦ Herramientas',
-  owner: '✦ Owner',
-  info: '✦ Info',
-  group: '✦ Grupos',
-  search: '✦ Buscadores',
-  sticker: '✦ Stickers',
-  ia: '✦ Inteligencia Artificial',
+  serbot: '🤖 𝙎𝙪𝙗-𝘽𝙤𝙩',
+  downloader: '📥 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨',
+  tools: '🔧 𝙃𝙚𝙧𝙧𝙖𝙢𝙞𝙚𝙣𝙩𝙖𝙨',
+  owner: '👑 𝙊𝙬𝙣𝙚𝙧',
+  info: 'ℹ️ 𝙄𝙣𝙛𝙤',
+  group: '👥 𝙂𝙧𝙪𝙥𝙤𝙨',
+  search: '🔎 𝘽𝙪𝙨𝙘𝙖𝙙𝙤𝙧𝙚𝙨',
+  sticker: '💟 𝙎𝙩𝙞𝙘𝙠𝙚𝙧𝙨',
+  ia: '🤖 𝙄𝘼',
 }
 
 const defaultMenu = {
@@ -37,25 +37,27 @@ const defaultMenu = {
 > %greeting
 ( *%tipo* )
 
-> ⤿ ¿Qué tal %name? ˎˊ˗
-%activity: %uptime ⌇
-%dateText: %date
-
-➤ ✐ Puedes personalizar el nombre de tu socket con:
-> ✎ ⤿ .setname
-> *✐ Y cambiar el banner con:*
-> ✎ ⤿ .setbanner
-
+┌
+│ ¿Qué tal *%name*?
+│%activity: %uptime
+│%dateText: %date
+│
+│ ➤ Puedes personalizar el nombre │de tu Sub-Bot con:
+│ 📝 .setname
+│ *✐ Y cambiar el banner con:*
+│ 📝 .setbanner
+└
 %readmore`.trimStart(),
 
-  header: '\n> *%decoration*\n> *❝ %category ❞*',
-  body: '\n> ☄︎ %cmd %islimit %isPremium',
-  footer: '',
-  after: '\n> ⋆creado por yo soy yo',
+  header: '\n╭━━━━➤ %category*',
+  body: '\n┃ *°* %cmd %islimit %isPremium',
+  footer: '╰━━━━━━━━━━━━━',
+  after: '\n> *•* _Powered By:_ *Tech-Bot Team*',
 }
 
 const handler = async (m, { conn, usedPrefix: _p }) => {
   try {
+
     const { exp, limit, level } = global.db.data.users[m.sender]
     const { min, xp, max } = xpRange(level, global.multiplier)
     const name = await conn.getName(m.sender)
@@ -90,7 +92,7 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
       }
     }
 
-    const tipo = botActual === '+50764735869'.replace(/\D/g, '')
+    const tipo = botActual === '+5491128967565'.replace(/\D/g, '')
       ? 'Principal 🅥'
       : 'Sub Bot 🅑'
 
