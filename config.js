@@ -9,7 +9,7 @@ global.owner = [
 ]
 
 
-global.mods = []
+global.mods = ['573134811343']
 global.prems = []
 
 global.libreria = 'Baileys'
@@ -23,7 +23,7 @@ global.yukiJadibts = true
 
 global.packname = 'Tech-Bot V1'
 global.namebot = 'Tech-Bot V1'
-global.author = '💖💝 Y⃟o⃟ S⃟o⃟y⃟ Y⃟o⃟ 💝 💖 '
+global.author = 'TECH-BOT TEAM'
 
 
 global.namecanal = ''
